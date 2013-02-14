@@ -219,7 +219,7 @@ adding_operator
 
 
 aggregate
-  : LPAREN element_association ( , element_association )* RPAREN
+  : LPAREN element_association ( COMMA element_association )* RPAREN
   ;
 
 
@@ -279,7 +279,7 @@ association_element :
 
 
 association_list :
-association_element ( , association_element )*
+association_element ( COMMA association_element )*
 ;
 
 
@@ -674,7 +674,7 @@ entity_class_entry : entity_class ( LTGT )?
 
 
 entity_class_entry_list :
-entity_class_entry ( , entity_class_entry )*
+entity_class_entry ( COMMA entity_class_entry )*
 ;
 
 
@@ -720,7 +720,7 @@ entity_header :
 ( formal_generic_clause )?
 ( formal_port_clause )?
 entity_name_list :
-entity_designator ( , entity_designator )*
+entity_designator ( COMMA entity_designator )*
 | OTHERS
 | ALL
 ;
@@ -752,7 +752,7 @@ enumeration_literal : identifier | character_literal
 
 
 enumeration_type_definition :
-LPAREN enumeration_literal ( , enumeration_literal )* RPAREN
+LPAREN enumeration_literal ( COMMA enumeration_literal )* RPAREN
 ;
 
 
@@ -880,7 +880,7 @@ group_constituent : name | character_literal
 ;
 
 
-group_constituent_list : group_constituent ( , group_constituent )*
+group_constituent_list : group_constituent ( COMMA group_constituent )*
 ;
 
 
@@ -903,7 +903,7 @@ identifier : basic_identifier | extended_identifier
 ;
 
 
-identifier_list : identifier ( , identifier )*
+identifier_list : identifier ( COMMA identifier )*
 ;
 
 
@@ -923,7 +923,7 @@ incomplete_type_declaration : TYPE identifier SEMICOLON
 ;
 
 
-index_constraint : LPAREN discrete_range ( , discrete_range )* RPAREN
+index_constraint : LPAREN discrete_range ( COMMA discrete_range )* RPAREN
 ;
 
 
@@ -937,7 +937,7 @@ index_subtype_definition : type_mark RANGE LTGT
 ;
 
 
-indexed_name : prefix LPAREN expression ( , expression )* RPAREN
+indexed_name : prefix LPAREN expression ( COMMA expression )* RPAREN
 ;
 
 
@@ -949,7 +949,7 @@ instantiated_unit :
 
 
 instantiation_list :
-/*instantiation_*/label ( , /*instantiation_*/label )*
+/*instantiation_*/label ( COMMA /*instantiation_*/label )*
 | OTHERS
 | ALL
 ;
@@ -1041,7 +1041,7 @@ logical_name : identifier
 ;
 
 
-logical_name_list : logical_name ( , logical_name )*
+logical_name_list : logical_name ( COMMA logical_name )*
 ;
 
 
@@ -1343,7 +1343,7 @@ target LTEQ options selected_waveforms SEMICOLON
 
 
 selected_waveforms :
-( waveform WHEN choices , )*
+( waveform WHEN choices COMMA )*
 waveform WHEN choices
 ;
 
@@ -1352,7 +1352,7 @@ sensitivity_clause : ON sensitivity_list
 ;
 
 
-sensitivity_list : signal_name ( , signal_name )*
+sensitivity_list : signal_name ( COMMA signal_name )*
 ;
 
 
@@ -1406,13 +1406,13 @@ signal_kind : REGISTER | BUS
 
 
 signal_list :
-signal_name ( , signal_name )*
+signal_name ( COMMA signal_name )*
 | OTHERS
 | ALL
 ;
 
 
-signature : ( ( type_mark ( , type_mark )* )? ( RETURN type_mark )? )?
+signature : ( ( type_mark ( COMMA type_mark )* )? ( RETURN type_mark )? )?
 ;
 
 
@@ -1543,13 +1543,13 @@ type_name
 
 
 unconstrained_array_definition :
-ARRAY LPAREN index_subtype_definition ( , index_subtype_definition )* RPAREN
+ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN
 OF element_subtype_indication
 ;
 
 
 use_clause :
-USE selected_name ( , selected_name )* SEMICOLON
+USE selected_name ( COMMA selected_name )* SEMICOLON
 ;
 
 
@@ -1566,7 +1566,7 @@ wait_statement :
 
 
 waveform :
-waveform_element ( , waveform_element )*
+waveform_element ( COMMA waveform_element )*
 | UNAFFECTED
 ;
 
