@@ -95,7 +95,7 @@ IN: 'in';
 INERTIAL: 'inertial';
 INOUT: 'inout';
 IS: 'is';
-LABEL: 'label';
+LABEL_KW: 'label';
 LIBRARY: 'library';
 LINKAGE: 'linkage';
 LITERAL: 'literal';
@@ -219,7 +219,7 @@ adding_operator
 
 
 aggregate
-  : LPAREN element_association { , element_association } RPAREN
+  : LPAREN element_association ( COMMA element_association )* RPAREN
   ;
 
 
@@ -253,7 +253,7 @@ block_declarative_item*
 
 
 architecture_statement_part :
-{ concurrent_statement }
+( concurrent_statement )*
 ;
 
 
@@ -264,22 +264,22 @@ unconstrained_array_definition | constrained_array_definition
 
 assertion :
 ASSERT condition
-[ REPORT expression ]
-[ SEVERITY expression ]
+( REPORT expression )?
+( SEVERITY expression )?
 ;
 
 
-assertion_statement : [ LABEL COLON ] assertion SEMICOLON
+assertion_statement : ( label COLON )? assertion SEMICOLON
 ;
 
 
 association_element :
-[ formal_part ARROW ] actual_part
+( formal_part ARROW )? actual_part
 ;
 
 
 association_list :
-association_element { , association_element }
+association_element ( COMMA association_element )*
 ;
 
 
@@ -293,7 +293,7 @@ attribute_designator : attribute_simple_name
 
 
 attribute_name :
-prefix [ signature ] ' attribute_designator [ LPAREN expression RPAREN ]
+prefix ( signature )? ' attribute_designator ( LPAREN expression RPAREN )?
 ;
 
 
@@ -314,11 +314,11 @@ base_unit_declaration : identifier SEMICOLON
 ;
 
 
-based_integer : extended_digit { [ underline ] extended_digit }
+based_integer : extended_digit ( ( underline )? extended_digit )*
 ;
 
 
-based_literal : base # based_integer [ . based_integer ] # [ exponent ]
+based_literal : base # based_integer ( . based_integer )? # ( exponent )?
 ;
 
 
@@ -332,26 +332,26 @@ upper_case_letter | digit | special_character| space_character
 ;
 
 
-basic_identifier : letter { [ underline ] letter_or_digit }
+basic_identifier : letter ( ( underline )? letter_or_digit )*
+
 binding_indication :
-[ USE entity_aspect ]
-[ generic_map_aspect ]
-[ port_map_aspect ]
+( USE entity_aspect )?
+( generic_map_aspect )?
+( port_map_aspect )?
+;
+
+bit_string_literal : base_specifier " ( bit_value )? "
 ;
 
 
-bit_string_literal : base_specifier " [ bit_value ] "
-;
-
-
-bit_value : extended_digit { [ underline ] extended_digit }
+bit_value : extended_digit ( ( underline )? extended_digit )*
 ;
 
 
 block_configuration :
 FOR block_specification
-{ use_clause }
-{ configuration_item }
+( use_clause )*
+( configuration_item )*
 END FOR SEMICOLON
 ;
 
@@ -378,47 +378,47 @@ subprogram_declaration
 
 
 block_declarative_part :
-{ block_declarative_item }
+( block_declarative_item )*
 ;
 
 
 block_header : 
-[ generic_clause
-[ generic_map_aspect SEMICOLON ] ]
-[ port_clause
-[ port_map_aspect SEMICOLON ] ]
+( generic_clause
+( generic_map_aspect SEMICOLON )? )?
+( port_clause
+( port_map_aspect SEMICOLON )? )?
 ;
 
 
 block_specification :
 architecture_name
-| block_statement_label
-| generate_statement_label [ LPAREN index_specification RPAREN ]
+| /*block_statement_*/label
+| /*generate_statement_*/label ( LPAREN index_specification RPAREN )?
 ;
 
 
 block_statement :
-block_label COLON
-BLOCK [ LPAREN guard_expression RPAREN ] [ IS ]
+/*block_*/label COLON
+BLOCK ( LPAREN guard_expression RPAREN )? ( IS )?
 block_header
 block_declarative_part
 BEGIN
 block_statement_part
-END BLOCK [ block_label ] SEMICOLON
+END BLOCK ( /*block_*/label )? SEMICOLON
 ;
 
 
 block_statement_part :
-{ concurrent_statement }
+( concurrent_statement )*
 ;
 
 
 case_statement :
-[ case_label COLON ]
+( /*case_*/label COLON )?
 CASE expression IS
 case_statement_alternative
-{ case_statement_alternative }
-END CASE [ case_label ] SEMICOLON
+( case_statement_alternative )*
+END CASE ( /*case_*/label )? SEMICOLON
 ;
 
 
@@ -440,31 +440,31 @@ simple_expression
 ;
 
 
-choices : choice { | choice }
+choices : choice ( | choice )*
 ;
 
 
 component_configuration :
 FOR component_specification
-[ binding_indication SEMICOLON ]
-[ block_configuration ]
+( binding_indication SEMICOLON )?
+( block_configuration )?
 END FOR SEMICOLON
 ;
 
 
 component_declaration :
-COMPONENT identifier [ IS ]
-[ local_generic_clause ]
-[ local_port_clause ]
-END COMPONENT [ component_simple_name ] SEMICOLON
+COMPONENT identifier ( IS )?
+( local_generic_clause )?
+( local_port_clause )?
+END COMPONENT ( component_simple_name )? SEMICOLON
 ;
 
 
 component_instantiation_statement :
-instantiation_label COLON
+/*instantiation_*/label COLON
 instantiated_unit
-[ generic_map_aspect ]
-[ port_map_aspect ] SEMICOLON
+( generic_map_aspect )?
+( port_map_aspect )? SEMICOLON
 ;
 
 
@@ -480,18 +480,18 @@ array_type_definition
 
 
 concurrent_assertion_statement :
-[ LABEL COLON ] [ POSTPONED ] assertion SEMICOLON
+( label COLON )? ( POSTPONED )? assertion SEMICOLON
 ;
 
 
 concurrent_procedure_call_statement :
-[ LABEL COLON ] [ POSTPONED ] procedure_call SEMICOLON
+( label COLON )? ( POSTPONED )? procedure_call SEMICOLON
 ;
 
 
 concurrent_signal_assignment_statement :
-[ LABEL COLON ] [ POSTPONED ] conditional_signal_assignment
-| [ LABEL COLON ] [ POSTPONED ] selected_signal_assignment
+( label COLON )? ( POSTPONED )? conditional_signal_assignment
+| ( label COLON )? ( POSTPONED )? selected_signal_assignment
 ;
 
 
@@ -520,8 +520,8 @@ target LTEQ options conditional_waveforms SEMICOLON
 
 
 conditional_waveforms :
-{ waveform WHEN condition ELSE }
-waveform [ WHEN condition ]
+( waveform WHEN condition ELSE )*
+waveform ( WHEN condition )?
 ;
 
 
@@ -529,7 +529,7 @@ configuration_declaration :
 CONFIGURATION identifier OF entity_name IS
 configuration_declarative_part
 block_configuration
-END [ CONFIGURATION ] [ configuration_simple_name ] SEMICOLON
+END ( CONFIGURATION )? ( configuration_simple_name )? SEMICOLON
 ;
 
 
@@ -541,17 +541,23 @@ use_clause
 
 
 configuration_declarative_part :
-{ configuration_declarative_item }
+( configuration_declarative_item )*
 ;
 
 
 configuration_item :
 block_configuration
 | component_configuration
+;
+
 configuration_specification :
 FOR component_specification binding_indication SEMICOLON
+;
+
 constant_declaration :
-CONSTANT identifier_list COLON subtype_indication [ VARASGN expression ] SEMICOLON
+CONSTANT identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
+;
+
 constrained_array_definition :
 ARRAY index_constraint OF element_subtype_indication
 ;
@@ -560,7 +566,7 @@ ARRAY index_constraint OF element_subtype_indication
 constraint :
 range_constraint
 | index_constraint
-context_clause : { context_item }
+context_clause : ( context_item )*
 ;
 
 
@@ -570,9 +576,8 @@ library_clause
 ;
 
 
-decimal_literal : integer [ . integer ] [ exponent ]
+decimal_literal : integer ( . integer )? ( exponent )?
 ;
-
 
 declaration :
 type_declaration
@@ -593,11 +598,11 @@ type_declaration
 
 delay_mechanism :
 TRANSPORT
-| [ REJECT time_expression ] INERTIAL
+| ( REJECT time_expression )? INERTIAL
 ;
 
 
-design_file : design_unit { design_unit }
+design_file : design_unit ( design_unit )*
 ;
 
 
@@ -623,7 +628,7 @@ discrete_range : discrete_subtype_indication | RANGE
 
 
 element_association :
-[ choices ARROW ] expression
+( choices ARROW )? expression
 ;
 
 
@@ -637,7 +642,7 @@ element_subtype_definition : subtype_indication
 
 
 entity_aspect :
-ENTITY entity_name [ LPAREN architecture_identifierRPAREN ]
+ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
 | CONFIGURATION configuration_name
 | OPEN
 ;
@@ -648,7 +653,7 @@ ENTITY
 | PROCEDURE
 | TYPE
 | SIGNAL
-| LABEL
+| LABEL_KW
 | GROUP
 | ARCHITECTURE
 | FUNCTION
@@ -664,12 +669,12 @@ ENTITY
 ;
 
 
-entity_class_entry : entity_class [ LTGT ]
+entity_class_entry : entity_class ( LTGT )?
 ;
 
 
 entity_class_entry_list :
-entity_class_entry { , entity_class_entry }
+entity_class_entry ( COMMA entity_class_entry )*
 ;
 
 
@@ -677,9 +682,9 @@ entity_declaration :
 ENTITY identifier IS
 entity_header
 entity_declarative_part
-[ BEGIN
-entity_statement_part ]
-END [ ENTITY ] [ entity_simple_name ] SEMICOLON
+( BEGIN
+entity_statement_part )?
+END ( ENTITY )? ( entity_simple_name )? SEMICOLON
 ;
 
 
@@ -703,19 +708,19 @@ subprogram_declaration
 
 
 entity_declarative_part :
-{ entity_declarative_item }
+( entity_declarative_item )*
 ;
 
 
-entity_designator : entity_tag [ signature ]
+entity_designator : entity_tag ( signature )?
 ;
 
 
 entity_header : 
-[ formal_generic_clause ]
-[ formal_port_clause ]
+( formal_generic_clause )?
+( formal_port_clause )?
 entity_name_list :
-entity_designator { , entity_designator }
+entity_designator ( COMMA entity_designator )*
 | OTHERS
 | ALL
 ;
@@ -734,7 +739,7 @@ concurrent_assertion_statement
 
 
 entity_statement_part :
-{ entity_statement }
+( entity_statement )*
 ;
 
 
@@ -747,26 +752,26 @@ enumeration_literal : identifier | character_literal
 
 
 enumeration_type_definition :
-LPAREN enumeration_literal { , enumeration_literal } RPAREN
+LPAREN enumeration_literal ( COMMA enumeration_literal )* RPAREN
 ;
 
 
 exit_statement :
-[ LABEL COLON ] EXIT [ loop_label ] [ WHEN condition ] SEMICOLON
+( label COLON )? EXIT ( /*loop_*/label )? ( WHEN condition )? SEMICOLON
 ;
 
 
-exponent : E [ PLUS ] integer | E Ð integer
+exponent : E ( PLUS )? integer | E MINUS integer
 ;
 
 
 expression :
-relation { AND relation }
-| relation { OR relation }
-| relation { XOR relation }
-| relation [ NAND relation ]
-| relation [ NOR relation ]
-| relation { XNOR relation }
+relation ( AND relation )*
+| relation ( OR relation )*
+| relation ( XOR relation )*
+| relation ( NAND relation )?
+| relation ( NOR relation )?
+| relation ( XNOR relation )*
 ;
 
 
@@ -774,19 +779,19 @@ extended_digit : digit | letter
 ;
 
 
-extended_identifier : \ graphic_character { graphic_character } \
+extended_identifier : \ graphic_character ( graphic_character )* \
 ;
 
 
 factor :
-primary [ EXPO primary ]
+primary ( EXPO primary )?
 | ABS primary
 | NOT primary
 ;
 
 
 file_declaration :
-FILE identifier_list COLON subtype_indication [ file_open_information ] SEMICOLON
+FILE identifier_list COLON subtype_indication ( file_open_information )? SEMICOLON
 ;
 
 
@@ -795,7 +800,7 @@ file_logical_name : string_expression
 
 
 file_open_information :
-[ OPEN file_open_kind_expression ] IS file_logical_name
+( OPEN file_open_kind_expression )? IS file_logical_name
 ;
 
 
@@ -832,17 +837,17 @@ TYPE identifier IS type_definition SEMICOLON
 
 
 function_call :
-function_name [ LPAREN actual_parameter_part RPAREN ]
+function_name ( LPAREN actual_parameter_part RPAREN )?
 ;
 
 
 generate_statement :
-generate_label COLON
+/*generate_*/label COLON
 generation_scheme GENERATE
-[ { block_declarative_item }
-BEGIN ]
-{ concurrent_statement }
-END GENERATE [ generate_label ] SEMICOLON
+( ( block_declarative_item )*
+BEGIN )?
+( concurrent_statement )*
+END GENERATE ( /*generate_*/label )? SEMICOLON
 ;
 
 
@@ -875,7 +880,7 @@ group_constituent : name | character_literal
 ;
 
 
-group_constituent_list : group_constituent { , group_constituent }
+group_constituent_list : group_constituent ( COMMA group_constituent )*
 ;
 
 
@@ -898,19 +903,19 @@ identifier : basic_identifier | extended_identifier
 ;
 
 
-identifier_list : identifier { , identifier }
+identifier_list : identifier ( COMMA identifier )*
 ;
 
 
 if_statement :
-[ if_label COLON ]
+( /*if_*/label COLON )?
 IF condition THEN
 sequence_of_statements
-{ ELSIF condition THEN
-sequence_of_statements }
-[ ELSE
-sequence_of_statements ]
-END IF [ if_label ] SEMICOLON
+( ELSIF condition THEN
+sequence_of_statements )*
+( ELSE
+sequence_of_statements )?
+END IF ( /*if_*/label )? SEMICOLON
 ;
 
 
@@ -918,7 +923,7 @@ incomplete_type_declaration : TYPE identifier SEMICOLON
 ;
 
 
-index_constraint : LPAREN discrete_range { , discrete_range } RPAREN
+index_constraint : LPAREN discrete_range ( COMMA discrete_range )* RPAREN
 ;
 
 
@@ -932,25 +937,25 @@ index_subtype_definition : type_mark RANGE LTGT
 ;
 
 
-indexed_name : prefix LPAREN expression { , expression } RPAREN
+indexed_name : prefix LPAREN expression ( COMMA expression )* RPAREN
 ;
 
 
 instantiated_unit :
-[ COMPONENT ] component_name
-| ENTITY entity_name [ LPAREN architecture_identifier RPAREN ]
+( COMPONENT )? component_name
+| ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
 | CONFIGURATION configuration_name
 ;
 
 
 instantiation_list :
-instantiation_label { , instantiation_label }
+/*instantiation_*/label ( COMMA /*instantiation_*/label )*
 | OTHERS
 | ALL
 ;
 
 
-integer : digit { [ underline ] digit }
+integer : digit ( ( underline )? digit )*
 ;
 
 
@@ -959,7 +964,7 @@ integer_type_definition : range_constraint
 
 
 interface_constant_declaration :
-[ CONSTANT ] identifier_list COLON [ IN ] subtype_indication [ VARASGN static_expression ]
+( CONSTANT )? identifier_list COLON ( IN )? subtype_indication ( VARASGN static_expression )?
 ;
 
 
@@ -981,17 +986,17 @@ FILE identifier_list COLON subtype_indication
 
 
 interface_list :
-interface_element { SEMICOLON interface_element }
+interface_element ( SEMICOLON interface_element )*
 ;
 
 
 interface_signal_declaration :
-[SIGNAL] identifier_list COLON [ mode ] subtype_indication [ BUS ] [ VARASGN static_expression ]
+(SIGNAL)? identifier_list COLON ( mode )? subtype_indication ( BUS )? ( VARASGN static_expression )?
 ;
 
 
 interface_variable_declaration :
-[VARIABLE] identifier_list COLON [ mode ] subtype_indication [ VARASGN static_expression ]
+(VARIABLE)? identifier_list COLON ( mode )? subtype_indication ( VARASGN static_expression )?
 ;
 
 
@@ -1001,7 +1006,7 @@ WHILE condition
 ;
 
 
-LABEL : identifier
+label : identifier
 ;
 
 
@@ -1036,7 +1041,7 @@ logical_name : identifier
 ;
 
 
-logical_name_list : logical_name { , logical_name }
+logical_name_list : logical_name ( COMMA logical_name )*
 ;
 
 
@@ -1045,10 +1050,10 @@ logical_operator : AND | OR | NAND | NOR | XOR | XNOR
 
 
 loop_statement :
-[ loop_label COLON ]
-[ iteration_scheme ] LOOP
+( /*loop_*/label COLON )?
+( iteration_scheme )? LOOP
 sequence_of_statements
-END LOOP [ loop_label ] SEMICOLON
+END LOOP ( /*loop_*/label )? SEMICOLON
 ;
 
 
@@ -1075,11 +1080,11 @@ simple_name
 
 
 next_statement :
-[ LABEL COLON ] NEXT [ loop_label ] [ WHEN condition ] SEMICOLON
+( label COLON )? NEXT ( /*loop_*/label )? ( WHEN condition )? SEMICOLON
 ;
 
 
-null_statement : [ LABEL COLON ] NULL SEMICOLON
+null_statement : ( label COLON )? NULL SEMICOLON
 ;
 
 
@@ -1101,14 +1106,14 @@ operator_symbol : string_literal
 ;
 
 
-options : [ GUARDED ] [ delay_mechanism ]
+options : ( GUARDED )? ( delay_mechanism )?
 ;
 
 
 package_body :
 PACKAGE BODY package_simple_name IS
 package_body_declarative_part
-END [ PACKAGE BODY ] [ package_simple_name ] SEMICOLON
+END ( PACKAGE BODY )? ( package_simple_name )? SEMICOLON
 ;
 
 
@@ -1128,14 +1133,14 @@ subprogram_declaration
 
 
 package_body_declarative_part :
-{ package_body_declarative_item }
+( package_body_declarative_item )*
 ;
 
 
 package_declaration :
 PACKAGE identifier IS
 package_declarative_part
-END [ PACKAGE ] [ package_simple_name ] SEMICOLON
+END ( PACKAGE )? ( package_simple_name )? SEMICOLON
 ;
 
 
@@ -1159,7 +1164,7 @@ subprogram_declaration
 
 
 package_declarative_part :
-{ package_declarative_item }
+( package_declarative_item )*
 ;
 
 
@@ -1168,7 +1173,7 @@ identifier IN discrete_range
 ;
 
 
-physical_literal : [ abstract_literal ] unit_name
+physical_literal : ( abstract_literal )? unit_name
 ;
 
 
@@ -1176,8 +1181,8 @@ physical_type_definition :
 range_constraint
 UNITS
 base_unit_declaration
-{ secondary_unit_declaration }
-END UNITS [ physical_type_simple_name ]
+( secondary_unit_declaration )*
+END UNITS ( physical_type_simple_name )?
 ;
 
 
@@ -1220,11 +1225,11 @@ entity_declaration
 ;
 
 
-procedure_call : procedure_name [ LPAREN actual_parameter_part RPAREN ]
+procedure_call : procedure_name ( LPAREN actual_parameter_part RPAREN )?
 ;
 
 
-procedure_call_statement : [ LABEL COLON ] procedure_call SEMICOLON
+procedure_call_statement : ( label COLON )? procedure_call SEMICOLON
 ;
 
 
@@ -1246,22 +1251,22 @@ subprogram_declaration
 
 
 process_declarative_part :
-{ process_declarative_item }
+( process_declarative_item )*
 ;
 
 
 process_statement :
-[ process_label COLON ]
-[ POSTPONED ] PROCESS [ LPAREN sensitivity_list RPAREN ] [ IS ]
+( /*process_*/label COLON )?
+( POSTPONED )? PROCESS ( LPAREN sensitivity_list RPAREN )? ( IS )?
 process_declarative_part
 BEGIN
 process_statement_part
-END [ POSTPONED ] PROCESS [ process_label ] SEMICOLON
+END ( POSTPONED )? PROCESS ( /*process_*/label )? SEMICOLON
 ;
 
 
 process_statement_part :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1284,13 +1289,13 @@ range_constraint : RANGE RANGE
 record_type_definition :
 RECORD
 element_declaration
-{ element_declaration }
-END RECORD [ record_type_simple_name ]
+( element_declaration )*
+END RECORD ( record_type_simple_name );
 ;
 
 
 relation :
-shift_expression [ relational_operator shift_expression ]
+shift_expression ( relational_operator shift_expression )?
 ;
 
 
@@ -1299,14 +1304,14 @@ relational_operator : EQ | NEQ | LT | LTEQ | GT | GTEQ
 
 
 report_statement :
-[ LABEL COLON ]
+( label COLON )?
 REPORT expression
-[ SEVERITY expression ] SEMICOLON
+( SEVERITY expression )? SEMICOLON
 ;
 
 
 return_statement :
-[ LABEL COLON ] RETURN [ expression ] SEMICOLON
+( label COLON )? RETURN ( expression )? SEMICOLON
 ;
 
 
@@ -1338,7 +1343,7 @@ target LTEQ options selected_waveforms SEMICOLON
 
 
 selected_waveforms :
-{ waveform WHEN choices , }
+( waveform WHEN choices COMMA )*
 waveform WHEN choices
 ;
 
@@ -1347,12 +1352,12 @@ sensitivity_clause : ON sensitivity_list
 ;
 
 
-sensitivity_list : signal_name { , signal_name }
+sensitivity_list : signal_name ( COMMA signal_name )*
 ;
 
 
 sequence_of_statements :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1374,7 +1379,7 @@ wait_statement
 
 
 shift_expression :
-simple_expression [ shift_operator simple_expression ]
+simple_expression ( shift_operator simple_expression )?;
 ;
 
 
@@ -1387,12 +1392,12 @@ sign : PLUS | MINUS
 
 
 signal_assignment_statement :
-[ LABEL COLON ] target LTEQ [ delay_mechanism ] waveform SEMICOLON
+( label COLON )? target LTEQ ( delay_mechanism )? waveform SEMICOLON
 ;
 
 
 signal_declaration :
-SIGNAL identifier_list COLON subtype_indication [ signal_kind ] [ VARASGN expression ] SEMICOLON
+SIGNAL identifier_list COLON subtype_indication ( signal_kind )? ( VARASGN expression )? SEMICOLON
 ;
 
 
@@ -1401,18 +1406,18 @@ signal_kind : REGISTER | BUS
 
 
 signal_list :
-signal_name { , signal_name }
+signal_name ( COMMA signal_name )*
 | OTHERS
 | ALL
 ;
 
 
-signature : [ [ type_mark { , type_mark } ] [ RETURN type_mark ] ]
+signature : ( ( type_mark ( COMMA type_mark )* )? ( RETURN type_mark )? )?
 ;
 
 
 simple_expression :
-[ sign ] term { adding_operator term }
+( sign )? term ( adding_operator term )*
 ;
 
 
@@ -1424,7 +1429,7 @@ slice_name : prefix LPAREN discrete_range RPAREN
 ;
 
 
-string_literal : " { graphic_character } "
+string_literal : " ( graphic_character )* "
 ;
 
 
@@ -1433,7 +1438,7 @@ subprogram_specification IS
 subprogram_declarative_part
 BEGIN
 subprogram_statement_part
-END [ subprogram_kind ] [ designator ] SEMICOLON
+END ( subprogram_kind )? ( designator )? SEMICOLON
 ;
 
 
@@ -1460,7 +1465,7 @@ subprogram_declaration
 
 
 subprogram_declarative_part :
-{ subprogram_declarative_item }
+( subprogram_declarative_item )*
 ;
 
 
@@ -1469,14 +1474,14 @@ subprogram_kind : PROCEDURE | FUNCTION
 
 
 subprogram_specification :
-PROCEDURE designator [ LPAREN formal_parameter_list RPAREN ]
-| [ PURE | IMPURE ] FUNCTION designator [ LPAREN formal_parameter_list RPAREN ]
+PROCEDURE designator ( LPAREN formal_parameter_list RPAREN )?
+| ( PURE | IMPURE )? FUNCTION designator ( LPAREN formal_parameter_list RPAREN )?
 RETURN type_mark
 ;
 
 
 subprogram_statement_part :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1486,7 +1491,7 @@ SUBTYPE identifier IS subtype_indication SEMICOLON
 
 
 subtype_indication :
-[ resolution_function_name ] type_mark [ constraint ]
+( resolution_function_name )? type_mark ( constraint )?
 ;
 
 
@@ -1505,7 +1510,7 @@ name
 
 
 term :
-factor { multiplying_operator factor }
+factor ( multiplying_operator factor )*
 ;
 
 
@@ -1538,35 +1543,36 @@ type_name
 
 
 unconstrained_array_definition :
-ARRAY LPAREN index_subtype_definition { , index_subtype_definition } RPAREN
+ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN
 OF element_subtype_indication
 ;
 
 
 use_clause :
-USE selected_name { , selected_name } SEMICOLON
+USE selected_name ( COMMA selected_name )* SEMICOLON
 ;
 
 
 variable_assignment_statement :
-[ LABEL COLON ] target VARASGN expression SEMICOLON
+( label COLON )? target VARASGN expression SEMICOLON
 variable_declaration :
-[ SHARED ] VARIABLE identifier_list COLON subtype_indication [ VARASGN expression ] SEMICOLON
+( SHARED )? VARIABLE identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
 ;
 
 
 wait_statement :
-[ LABEL COLON ] WAIT [ sensitivity_clause ] [ condition_clause ] [ timeout_clause ] SEMICOLON
+( label COLON )? WAIT ( sensitivity_clause )? ( condition_clause )? ( timeout_clause )? SEMICOLON
 ;
 
 
 waveform :
-waveform_element { , waveform_element }
+waveform_element ( COMMA waveform_element )*
 | UNAFFECTED
 ;
 
 
 waveform_element :
-value_expression [ AFTER time_expression ]
-| NULL [ AFTER time_expression ]
+value_expression ( AFTER time_expression )?
+| NULL ( AFTER time_expression )?
 ;
+
