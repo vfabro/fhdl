@@ -95,7 +95,7 @@ IN: 'in';
 INERTIAL: 'inertial';
 INOUT: 'inout';
 IS: 'is';
-LABEL: 'label';
+LABEL_KW: 'label';
 LIBRARY: 'library';
 LINKAGE: 'linkage';
 LITERAL: 'literal';
@@ -269,7 +269,7 @@ ASSERT condition
 ;
 
 
-assertion_statement : [ LABEL COLON ] assertion SEMICOLON
+assertion_statement : [ label COLON ] assertion SEMICOLON
 ;
 
 
@@ -392,13 +392,13 @@ block_header :
 
 block_specification :
 architecture_name
-| block_statement_label
-| generate_statement_label [ LPAREN index_specification RPAREN ]
+| /*block_statement_*/label
+| /*generate_statement_*/label [ LPAREN index_specification RPAREN ]
 ;
 
 
 block_statement :
-block_label COLON
+/*block_*/label COLON
 BLOCK [ LPAREN guard_expression RPAREN ] [ IS ]
 block_header
 block_declarative_part
@@ -414,11 +414,11 @@ block_statement_part :
 
 
 case_statement :
-[ case_label COLON ]
+[ /*case_*/label COLON ]
 CASE expression IS
 case_statement_alternative
 { case_statement_alternative }
-END CASE [ case_label ] SEMICOLON
+END CASE [ /*case_*/label ] SEMICOLON
 ;
 
 
@@ -461,7 +461,7 @@ END COMPONENT [ component_simple_name ] SEMICOLON
 
 
 component_instantiation_statement :
-instantiation_label COLON
+/*instantiation_*/label COLON
 instantiated_unit
 [ generic_map_aspect ]
 [ port_map_aspect ] SEMICOLON
@@ -480,18 +480,18 @@ array_type_definition
 
 
 concurrent_assertion_statement :
-[ LABEL COLON ] [ POSTPONED ] assertion SEMICOLON
+[ label COLON ] [ POSTPONED ] assertion SEMICOLON
 ;
 
 
 concurrent_procedure_call_statement :
-[ LABEL COLON ] [ POSTPONED ] procedure_call SEMICOLON
+[ label COLON ] [ POSTPONED ] procedure_call SEMICOLON
 ;
 
 
 concurrent_signal_assignment_statement :
-[ LABEL COLON ] [ POSTPONED ] conditional_signal_assignment
-| [ LABEL COLON ] [ POSTPONED ] selected_signal_assignment
+[ label COLON ] [ POSTPONED ] conditional_signal_assignment
+| [ label COLON ] [ POSTPONED ] selected_signal_assignment
 ;
 
 
@@ -637,7 +637,7 @@ element_subtype_definition : subtype_indication
 
 
 entity_aspect :
-ENTITY entity_name [ LPAREN architecture_identifierRPAREN ]
+ENTITY entity_name [ LPAREN architecture_identifier RPAREN ]
 | CONFIGURATION configuration_name
 | OPEN
 ;
@@ -648,7 +648,7 @@ ENTITY
 | PROCEDURE
 | TYPE
 | SIGNAL
-| LABEL
+| LABEL_KW
 | GROUP
 | ARCHITECTURE
 | FUNCTION
@@ -752,7 +752,7 @@ LPAREN enumeration_literal { , enumeration_literal } RPAREN
 
 
 exit_statement :
-[ LABEL COLON ] EXIT [ loop_label ] [ WHEN condition ] SEMICOLON
+[ label COLON ] EXIT [ /*loop_*/label ] [ WHEN condition ] SEMICOLON
 ;
 
 
@@ -837,12 +837,12 @@ function_name [ LPAREN actual_parameter_part RPAREN ]
 
 
 generate_statement :
-generate_label COLON
+/*generate_*/label COLON
 generation_scheme GENERATE
 [ { block_declarative_item }
 BEGIN ]
 { concurrent_statement }
-END GENERATE [ generate_label ] SEMICOLON
+END GENERATE [ /*generate_*/label ] SEMICOLON
 ;
 
 
@@ -903,14 +903,14 @@ identifier_list : identifier { , identifier }
 
 
 if_statement :
-[ if_label COLON ]
+[ /*if_*/label COLON ]
 IF condition THEN
 sequence_of_statements
 { ELSIF condition THEN
 sequence_of_statements }
 [ ELSE
 sequence_of_statements ]
-END IF [ if_label ] SEMICOLON
+END IF [ /*if_*/label ] SEMICOLON
 ;
 
 
@@ -944,7 +944,7 @@ instantiated_unit :
 
 
 instantiation_list :
-instantiation_label { , instantiation_label }
+/*instantiation_*/label { , /*instantiation_*/label }
 | OTHERS
 | ALL
 ;
@@ -1001,7 +1001,7 @@ WHILE condition
 ;
 
 
-LABEL : identifier
+label : identifier
 ;
 
 
@@ -1045,10 +1045,10 @@ logical_operator : AND | OR | NAND | NOR | XOR | XNOR
 
 
 loop_statement :
-[ loop_label COLON ]
+[ /*loop_*/label COLON ]
 [ iteration_scheme ] LOOP
 sequence_of_statements
-END LOOP [ loop_label ] SEMICOLON
+END LOOP [ /*loop_*/label ] SEMICOLON
 ;
 
 
@@ -1075,11 +1075,11 @@ simple_name
 
 
 next_statement :
-[ LABEL COLON ] NEXT [ loop_label ] [ WHEN condition ] SEMICOLON
+[ label COLON ] NEXT [ /*loop_*/label ] [ WHEN condition ] SEMICOLON
 ;
 
 
-null_statement : [ LABEL COLON ] NULL SEMICOLON
+null_statement : [ label COLON ] NULL SEMICOLON
 ;
 
 
@@ -1224,7 +1224,7 @@ procedure_call : procedure_name [ LPAREN actual_parameter_part RPAREN ]
 ;
 
 
-procedure_call_statement : [ LABEL COLON ] procedure_call SEMICOLON
+procedure_call_statement : [ label COLON ] procedure_call SEMICOLON
 ;
 
 
@@ -1251,12 +1251,12 @@ process_declarative_part :
 
 
 process_statement :
-[ process_label COLON ]
+[ /*process_*/label COLON ]
 [ POSTPONED ] PROCESS [ LPAREN sensitivity_list RPAREN ] [ IS ]
 process_declarative_part
 BEGIN
 process_statement_part
-END [ POSTPONED ] PROCESS [ process_label ] SEMICOLON
+END [ POSTPONED ] PROCESS [ /*process_*/label ] SEMICOLON
 ;
 
 
@@ -1299,14 +1299,14 @@ relational_operator : EQ | NEQ | LT | LTEQ | GT | GTEQ
 
 
 report_statement :
-[ LABEL COLON ]
+[ label COLON ]
 REPORT expression
 [ SEVERITY expression ] SEMICOLON
 ;
 
 
 return_statement :
-[ LABEL COLON ] RETURN [ expression ] SEMICOLON
+[ label COLON ] RETURN [ expression ] SEMICOLON
 ;
 
 
@@ -1387,7 +1387,7 @@ sign : PLUS | MINUS
 
 
 signal_assignment_statement :
-[ LABEL COLON ] target LTEQ [ delay_mechanism ] waveform SEMICOLON
+[ label COLON ] target LTEQ [ delay_mechanism ] waveform SEMICOLON
 ;
 
 
@@ -1549,14 +1549,14 @@ USE selected_name { , selected_name } SEMICOLON
 
 
 variable_assignment_statement :
-[ LABEL COLON ] target VARASGN expression SEMICOLON
+[ label COLON ] target VARASGN expression SEMICOLON
 variable_declaration :
 [ SHARED ] VARIABLE identifier_list COLON subtype_indication [ VARASGN expression ] SEMICOLON
 ;
 
 
 wait_statement :
-[ LABEL COLON ] WAIT [ sensitivity_clause ] [ condition_clause ] [ timeout_clause ] SEMICOLON
+[ label COLON ] WAIT [ sensitivity_clause ] [ condition_clause ] [ timeout_clause ] SEMICOLON
 ;
 
 
