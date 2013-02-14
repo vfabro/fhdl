@@ -761,7 +761,7 @@ exit_statement :
 ;
 
 
-exponent : E ( PLUS )? integer | E - integer
+exponent : E ( PLUS )? integer | E MINUS integer
 ;
 
 
