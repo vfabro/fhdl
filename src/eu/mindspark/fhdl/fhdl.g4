@@ -400,7 +400,7 @@ choice
   ;
 
 choices
-  : choice (| choice )*
+  : choice (PIPE choice )*
   ;
 
 component_configuration
