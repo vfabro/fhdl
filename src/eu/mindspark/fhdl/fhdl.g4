@@ -1065,7 +1065,7 @@ mode : IN | OUT | INOUT | BUFFER | LINKAGE
 ;
 
 
-multiplying_operator : * | / | MOD | REM
+multiplying_operator : STAR | SLASH | MOD | REM
 ;
 
 
