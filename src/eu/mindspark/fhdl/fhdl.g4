@@ -219,7 +219,7 @@ adding_operator
 
 
 aggregate
-  : LPAREN element_association { , element_association } RPAREN
+  : LPAREN element_association ( , element_association )* RPAREN
   ;
 
 
@@ -253,7 +253,7 @@ block_declarative_item*
 
 
 architecture_statement_part :
-{ concurrent_statement }
+( concurrent_statement )*
 ;
 
 
@@ -279,7 +279,7 @@ association_element :
 
 
 association_list :
-association_element { , association_element }
+association_element ( , association_element )*
 ;
 
 
@@ -314,11 +314,11 @@ base_unit_declaration : identifier SEMICOLON
 ;
 
 
-based_integer : extended_digit { [ underline ] extended_digit }
+based_integer : extended_digit ( ( underline )? extended_digit )*
 ;
 
 
-based_literal : base # based_integer [ . based_integer ] # [ exponent ]
+based_literal : base # based_integer ( . based_integer )? # ( exponent )?
 ;
 
 
@@ -332,7 +332,7 @@ upper_case_letter | digit | special_character| space_character
 ;
 
 
-basic_identifier : letter { [ underline ] letter_or_digit }
+basic_identifier : letter ( ( underline )? letter_or_digit )*
 
 binding_indication :
 ( USE entity_aspect )?
@@ -340,18 +340,18 @@ binding_indication :
 ( port_map_aspect )?
 ;
 
-bit_string_literal : base_specifier " [ bit_value ] "
+bit_string_literal : base_specifier " ( bit_value )? "
 ;
 
 
-bit_value : extended_digit { [ underline ] extended_digit }
+bit_value : extended_digit ( ( underline )? extended_digit )*
 ;
 
 
 block_configuration :
 FOR block_specification
-{ use_clause }
-{ configuration_item }
+( use_clause )*
+( configuration_item )*
 END FOR SEMICOLON
 ;
 
@@ -378,7 +378,7 @@ subprogram_declaration
 
 
 block_declarative_part :
-{ block_declarative_item }
+( block_declarative_item )*
 ;
 
 
@@ -409,7 +409,7 @@ END BLOCK ( /*block_*/label )? SEMICOLON
 
 
 block_statement_part :
-{ concurrent_statement }
+( concurrent_statement )*
 ;
 
 
@@ -417,7 +417,7 @@ case_statement :
 ( /*case_*/label COLON )?
 CASE expression IS
 case_statement_alternative
-{ case_statement_alternative }
+( case_statement_alternative )*
 END CASE ( /*case_*/label )? SEMICOLON
 ;
 
@@ -440,7 +440,7 @@ simple_expression
 ;
 
 
-choices : choice { | choice }
+choices : choice ( | choice )*
 ;
 
 
@@ -520,7 +520,7 @@ target LTEQ options conditional_waveforms SEMICOLON
 
 
 conditional_waveforms :
-{ waveform WHEN condition ELSE }
+( waveform WHEN condition ELSE )*
 waveform ( WHEN condition )?
 ;
 
@@ -541,7 +541,7 @@ use_clause
 
 
 configuration_declarative_part :
-{ configuration_declarative_item }
+( configuration_declarative_item )*
 ;
 
 
@@ -566,7 +566,7 @@ ARRAY index_constraint OF element_subtype_indication
 constraint :
 range_constraint
 | index_constraint
-context_clause : { context_item }
+context_clause : ( context_item )*
 ;
 
 
@@ -576,9 +576,8 @@ library_clause
 ;
 
 
-decimal_literal : integer [ . integer ] [ exponent ]
+decimal_literal : integer ( . integer )? ( exponent )?
 ;
-
 
 declaration :
 type_declaration
@@ -603,7 +602,7 @@ TRANSPORT
 ;
 
 
-design_file : design_unit { design_unit }
+design_file : design_unit ( design_unit )*
 ;
 
 
@@ -675,7 +674,7 @@ entity_class_entry : entity_class ( LTGT )?
 
 
 entity_class_entry_list :
-entity_class_entry { , entity_class_entry }
+entity_class_entry ( , entity_class_entry )*
 ;
 
 
@@ -709,7 +708,7 @@ subprogram_declaration
 
 
 entity_declarative_part :
-{ entity_declarative_item }
+( entity_declarative_item )*
 ;
 
 
@@ -721,7 +720,7 @@ entity_header :
 ( formal_generic_clause )?
 ( formal_port_clause )?
 entity_name_list :
-entity_designator { , entity_designator }
+entity_designator ( , entity_designator )*
 | OTHERS
 | ALL
 ;
@@ -740,7 +739,7 @@ concurrent_assertion_statement
 
 
 entity_statement_part :
-{ entity_statement }
+( entity_statement )*
 ;
 
 
@@ -753,7 +752,7 @@ enumeration_literal : identifier | character_literal
 
 
 enumeration_type_definition :
-LPAREN enumeration_literal { , enumeration_literal } RPAREN
+LPAREN enumeration_literal ( , enumeration_literal )* RPAREN
 ;
 
 
@@ -762,17 +761,17 @@ exit_statement :
 ;
 
 
-exponent : E [ PLUS ] integer | E - integer
+exponent : E ( PLUS )? integer | E - integer
 ;
 
 
 expression :
-relation { AND relation }
-| relation { OR relation }
-| relation { XOR relation }
+relation ( AND relation )*
+| relation ( OR relation )*
+| relation ( XOR relation )*
 | relation ( NAND relation )?
 | relation ( NOR relation )?
-| relation { XNOR relation }
+| relation ( XNOR relation )*
 ;
 
 
@@ -780,7 +779,7 @@ extended_digit : digit | letter
 ;
 
 
-extended_identifier : \ graphic_character { graphic_character } \
+extended_identifier : \ graphic_character ( graphic_character )* \
 ;
 
 
@@ -845,9 +844,9 @@ function_name ( LPAREN actual_parameter_part RPAREN )?
 generate_statement :
 /*generate_*/label COLON
 generation_scheme GENERATE
-( { block_declarative_item }
+( ( block_declarative_item )*
 BEGIN )?
-{ concurrent_statement }
+( concurrent_statement )*
 END GENERATE ( /*generate_*/label )? SEMICOLON
 ;
 
@@ -881,7 +880,7 @@ group_constituent : name | character_literal
 ;
 
 
-group_constituent_list : group_constituent { , group_constituent }
+group_constituent_list : group_constituent ( , group_constituent )*
 ;
 
 
@@ -904,7 +903,7 @@ identifier : basic_identifier | extended_identifier
 ;
 
 
-identifier_list : identifier { , identifier }
+identifier_list : identifier ( , identifier )*
 ;
 
 
@@ -912,8 +911,8 @@ if_statement :
 ( /*if_*/label COLON )?
 IF condition THEN
 sequence_of_statements
-{ ELSIF condition THEN
-sequence_of_statements }
+( ELSIF condition THEN
+sequence_of_statements )*
 ( ELSE
 sequence_of_statements )?
 END IF ( /*if_*/label )? SEMICOLON
@@ -924,7 +923,7 @@ incomplete_type_declaration : TYPE identifier SEMICOLON
 ;
 
 
-index_constraint : LPAREN discrete_range { , discrete_range } RPAREN
+index_constraint : LPAREN discrete_range ( , discrete_range )* RPAREN
 ;
 
 
@@ -938,7 +937,7 @@ index_subtype_definition : type_mark RANGE LTGT
 ;
 
 
-indexed_name : prefix LPAREN expression { , expression } RPAREN
+indexed_name : prefix LPAREN expression ( , expression )* RPAREN
 ;
 
 
@@ -950,13 +949,13 @@ instantiated_unit :
 
 
 instantiation_list :
-/*instantiation_*/label { , /*instantiation_*/label }
+/*instantiation_*/label ( , /*instantiation_*/label )*
 | OTHERS
 | ALL
 ;
 
 
-integer : digit { [ underline ] digit }
+integer : digit ( ( underline )? digit )*
 ;
 
 
@@ -987,7 +986,7 @@ FILE identifier_list COLON subtype_indication
 
 
 interface_list :
-interface_element { SEMICOLON interface_element }
+interface_element ( SEMICOLON interface_element )*
 ;
 
 
@@ -1042,7 +1041,7 @@ logical_name : identifier
 ;
 
 
-logical_name_list : logical_name { , logical_name }
+logical_name_list : logical_name ( , logical_name )*
 ;
 
 
@@ -1052,7 +1051,7 @@ logical_operator : AND | OR | NAND | NOR | XOR | XNOR
 
 loop_statement :
 ( /*loop_*/label COLON )?
-[ iteration_scheme ] LOOP
+( iteration_scheme )? LOOP
 sequence_of_statements
 END LOOP ( /*loop_*/label )? SEMICOLON
 ;
@@ -1134,7 +1133,7 @@ subprogram_declaration
 
 
 package_body_declarative_part :
-{ package_body_declarative_item }
+( package_body_declarative_item )*
 ;
 
 
@@ -1165,7 +1164,7 @@ subprogram_declaration
 
 
 package_declarative_part :
-{ package_declarative_item }
+( package_declarative_item )*
 ;
 
 
@@ -1174,7 +1173,7 @@ identifier IN discrete_range
 ;
 
 
-physical_literal : [ abstract_literal ] unit_name
+physical_literal : ( abstract_literal )? unit_name
 ;
 
 
@@ -1182,7 +1181,7 @@ physical_type_definition :
 range_constraint
 UNITS
 base_unit_declaration
-{ secondary_unit_declaration }
+( secondary_unit_declaration )*
 END UNITS ( physical_type_simple_name )?
 ;
 
@@ -1252,7 +1251,7 @@ subprogram_declaration
 
 
 process_declarative_part :
-{ process_declarative_item }
+( process_declarative_item )*
 ;
 
 
@@ -1267,7 +1266,7 @@ END ( POSTPONED )? PROCESS ( /*process_*/label )? SEMICOLON
 
 
 process_statement_part :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1290,7 +1289,7 @@ range_constraint : RANGE RANGE
 record_type_definition :
 RECORD
 element_declaration
-{ element_declaration }
+( element_declaration )*
 END RECORD ( record_type_simple_name );
 ;
 
@@ -1344,7 +1343,7 @@ target LTEQ options selected_waveforms SEMICOLON
 
 
 selected_waveforms :
-{ waveform WHEN choices , }
+( waveform WHEN choices , )*
 waveform WHEN choices
 ;
 
@@ -1353,12 +1352,12 @@ sensitivity_clause : ON sensitivity_list
 ;
 
 
-sensitivity_list : signal_name { , signal_name }
+sensitivity_list : signal_name ( , signal_name )*
 ;
 
 
 sequence_of_statements :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1407,18 +1406,18 @@ signal_kind : REGISTER | BUS
 
 
 signal_list :
-signal_name { , signal_name }
+signal_name ( , signal_name )*
 | OTHERS
 | ALL
 ;
 
 
-signature : ( ( type_mark { , type_mark } )? ( RETURN type_mark )? )?
+signature : ( ( type_mark ( , type_mark )* )? ( RETURN type_mark )? )?
 ;
 
 
 simple_expression :
-( sign )? term { adding_operator term }
+( sign )? term ( adding_operator term )*
 ;
 
 
@@ -1430,7 +1429,7 @@ slice_name : prefix LPAREN discrete_range RPAREN
 ;
 
 
-string_literal : " { graphic_character } "
+string_literal : " ( graphic_character )* "
 ;
 
 
@@ -1466,7 +1465,7 @@ subprogram_declaration
 
 
 subprogram_declarative_part :
-{ subprogram_declarative_item }
+( subprogram_declarative_item )*
 ;
 
 
@@ -1482,7 +1481,7 @@ RETURN type_mark
 
 
 subprogram_statement_part :
-{ sequential_statement }
+( sequential_statement )*
 ;
 
 
@@ -1511,7 +1510,7 @@ name
 
 
 term :
-factor { multiplying_operator factor }
+factor ( multiplying_operator factor )*
 ;
 
 
@@ -1544,13 +1543,13 @@ type_name
 
 
 unconstrained_array_definition :
-ARRAY LPAREN index_subtype_definition { , index_subtype_definition } RPAREN
+ARRAY LPAREN index_subtype_definition ( , index_subtype_definition )* RPAREN
 OF element_subtype_indication
 ;
 
 
 use_clause :
-USE selected_name { , selected_name } SEMICOLON
+USE selected_name ( , selected_name )* SEMICOLON
 ;
 
 
@@ -1567,7 +1566,7 @@ wait_statement :
 
 
 waveform :
-waveform_element { , waveform_element }
+waveform_element ( , waveform_element )*
 | UNAFFECTED
 ;
 
