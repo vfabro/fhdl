@@ -120,7 +120,7 @@ POSTPONED: 'postponed';
 PROCEDURE: 'procedure';
 PROCESS: 'process';
 PURE: 'pure';
-RANGE: 'range';
+RANGE_KW: 'range';
 RECORD: 'record';
 REGISTER: 'register';
 REJECT: 'reject';
@@ -557,7 +557,7 @@ disconnection_specification
 
 discrete_range
   : discrete_subtype_indication
-  | RANGE
+  | range
   ;
 
 element_association
@@ -827,7 +827,7 @@ index_specification
   ;
 
 index_subtype_definition
-  : type_mark RANGE LTGT
+  : type_mark RANGE_KW LTGT
   ;
 
 indexed_name
@@ -1135,13 +1135,13 @@ qualified_expression
   | type_mark ' aggregate
   ;
 
-RANGE
+range
   : range_attribute_name
   | simple_expression direction simple_expression
   ;
 
 range_constraint
-  : RANGE RANGE
+  : RANGE_KW range
   ;
 
 record_type_definition
