@@ -253,7 +253,7 @@ block_declarative_item*
 
 
 architecture_statement_part :
-( concurrent_statement )*
+concurrent_statement*
 ;
 
 
@@ -350,8 +350,8 @@ bit_value : extended_digit ( underline? extended_digit )*
 
 block_configuration :
 FOR block_specification
-( use_clause )*
-( configuration_item )*
+use_clause*
+configuration_item*
 END FOR SEMICOLON
 ;
 
@@ -378,7 +378,7 @@ subprogram_declaration
 
 
 block_declarative_part :
-( block_declarative_item )*
+block_declarative_item*
 ;
 
 
@@ -409,7 +409,7 @@ END BLOCK /*block_*/label? SEMICOLON
 
 
 block_statement_part :
-( concurrent_statement )*
+concurrent_statement*
 ;
 
 
@@ -417,7 +417,7 @@ case_statement :
 ( /*case_*/label COLON )?
 CASE expression IS
 case_statement_alternative
-( case_statement_alternative )*
+case_statement_alternative*
 END CASE /*case_*/label? SEMICOLON
 ;
 
@@ -541,7 +541,7 @@ use_clause
 
 
 configuration_declarative_part :
-( configuration_declarative_item )*
+configuration_declarative_item*
 ;
 
 
@@ -566,7 +566,7 @@ ARRAY index_constraint OF element_subtype_indication
 constraint :
 range_constraint
 | index_constraint
-context_clause : ( context_item )*
+context_clause : context_item*
 ;
 
 
@@ -602,7 +602,7 @@ TRANSPORT
 ;
 
 
-design_file : design_unit ( design_unit )*
+design_file : design_unit design_unit*
 ;
 
 
@@ -708,7 +708,7 @@ subprogram_declaration
 
 
 entity_declarative_part :
-( entity_declarative_item )*
+entity_declarative_item*
 ;
 
 
@@ -739,7 +739,7 @@ concurrent_assertion_statement
 
 
 entity_statement_part :
-( entity_statement )*
+entity_statement*
 ;
 
 
@@ -779,7 +779,7 @@ extended_digit : digit | letter
 ;
 
 
-extended_identifier : \ graphic_character ( graphic_character )* \
+extended_identifier : \ graphic_character graphic_character* \
 ;
 
 
@@ -844,9 +844,9 @@ function_name ( LPAREN actual_parameter_part RPAREN )?
 generate_statement :
 /*generate_*/label COLON
 generation_scheme GENERATE
-( ( block_declarative_item )*
+( block_declarative_item*
 BEGIN )?
-( concurrent_statement )*
+concurrent_statement*
 END GENERATE /*generate_*/label? SEMICOLON
 ;
 
@@ -1133,7 +1133,7 @@ subprogram_declaration
 
 
 package_body_declarative_part :
-( package_body_declarative_item )*
+package_body_declarative_item*
 ;
 
 
@@ -1164,7 +1164,7 @@ subprogram_declaration
 
 
 package_declarative_part :
-( package_declarative_item )*
+package_declarative_item*
 ;
 
 
@@ -1181,7 +1181,7 @@ physical_type_definition :
 range_constraint
 UNITS
 base_unit_declaration
-( secondary_unit_declaration )*
+secondary_unit_declaration*
 END UNITS ( physical_type_simple_name )?
 ;
 
@@ -1251,7 +1251,7 @@ subprogram_declaration
 
 
 process_declarative_part :
-( process_declarative_item )*
+process_declarative_item*
 ;
 
 
@@ -1266,7 +1266,7 @@ END POSTPONED? PROCESS /*process_*/label? SEMICOLON
 
 
 process_statement_part :
-( sequential_statement )*
+sequential_statement*
 ;
 
 
@@ -1289,7 +1289,7 @@ range_constraint : RANGE RANGE
 record_type_definition :
 RECORD
 element_declaration
-( element_declaration )*
+element_declaration*
 END RECORD ( record_type_simple_name );
 ;
 
@@ -1357,7 +1357,7 @@ sensitivity_list : signal_name ( COMMA signal_name )*
 
 
 sequence_of_statements :
-( sequential_statement )*
+sequential_statement*
 ;
 
 
@@ -1429,7 +1429,7 @@ slice_name : prefix LPAREN discrete_range RPAREN
 ;
 
 
-string_literal : " ( graphic_character )* "
+string_literal : " graphic_character* "
 ;
 
 
@@ -1465,7 +1465,7 @@ subprogram_declaration
 
 
 subprogram_declarative_part :
-( subprogram_declarative_item )*
+subprogram_declarative_item*
 ;
 
 
@@ -1481,7 +1481,7 @@ RETURN type_mark
 
 
 subprogram_statement_part :
-( sequential_statement )*
+sequential_statement*
 ;
 
 
