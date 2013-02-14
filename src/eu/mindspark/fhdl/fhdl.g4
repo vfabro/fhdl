@@ -929,23 +929,8 @@ logical_name_list
   : logical_name ( COMMA logical_name )*
   ;
 
-logical_operator
-  : AND
-  | OR
-  | NAND
-  | NOR
-  | XOR
-  | XNOR
-  ;
-
 loop_statement
   : ( /*loop_*/label COLON )? ( iteration_scheme )? LOOP sequence_of_statements END LOOP /*loop_*/label? SEMICOLON
-  ;
-
-miscellaneous_operator
-  : EXPO
-  | ABS
-  | NOT
   ;
 
 mode
