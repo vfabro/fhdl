@@ -601,7 +601,7 @@ entity_class
   ;
 
 entity_class_entry
-  : entity_class LTGT?
+  : entity_class BOX?
   ;
 
 entity_class_entry_list
@@ -831,7 +831,7 @@ index_specification
   ;
 
 index_subtype_definition
-  : type_mark RANGE_KW LTGT
+  : type_mark RANGE_KW BOX
   ;
 
 indexed_name
