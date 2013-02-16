@@ -295,9 +295,9 @@ base
   ;
 
 base_specifier
-  : B
-  | O
-  | X
+  : 'B'
+  | 'O'
+  | 'X'
   ;
 
 base_unit_declaration
