@@ -195,19 +195,21 @@ access_type_definition
 
 actual_designator
   : expression
-  | signal_name
-  | variable_name
-  | file_name
+  | /*signal_*/name
+/*
+  | /*variable_*/name
+  | /*file_*/name
+*/
   | OPEN
   ;
 
 actual_parameter_part
-  : parameter_association_list
+  : /*parameter_*/association_list
   ;
 
 actual_part
   : actual_designator
-  | function_name LPAREN actual_designator RPAREN
+  | /*function_*/name LPAREN actual_designator RPAREN
   | type_mark LPAREN actual_designator RPAREN
   ;
 
@@ -237,7 +239,7 @@ allocator
   ;
 
 architecture_body
-  : ARCHITECTURE identifier OF entity_name IS
+  : ARCHITECTURE identifier OF /*entity_*/name IS
     architecture_declarative_part
     BEGIN architecture_statement_part
     END ARCHITECTURE? /*architecture_*/simple_name? SEMICOLON
@@ -277,7 +279,7 @@ attribute_declaration
   ;
 
 attribute_designator
-  : attribute_simple_name
+  : /*attribute_*/simple_name
   ;
 
 attribute_name
@@ -345,7 +347,7 @@ block_declarative_item
   | subtype_declaration
   | constant_declaration
   | signal_declaration
-  | shared_variable_declaration
+  | /*shared_*/variable_declaration
   | file_declaration
   | alias_declaration
   | component_declaration
@@ -367,13 +369,13 @@ block_header
   ;
 
 block_specification
-  : architecture_name
+  : /*architecture_*/name
   | /*block_statement_*/label
   | /*generate_statement_*/label ( LPAREN index_specification RPAREN )?
   ;
 
 block_statement
-  : /*block_*/label COLON BLOCK ( LPAREN guard_expression RPAREN )? IS? block_header block_declarative_part BEGIN block_statement_part END BLOCK /*block_*/label? SEMICOLON
+  : /*block_*/label COLON BLOCK ( LPAREN /*guard_*/expression RPAREN )? IS? block_header block_declarative_part BEGIN block_statement_part END BLOCK /*block_*/label? SEMICOLON
   ;
 
 block_statement_part
@@ -395,7 +397,7 @@ character_literal
 choice
   : simple_expression
   | discrete_range
-  | element_simple_name
+  | /*element_*/simple_name
   | OTHERS
   ;
 
@@ -408,7 +410,7 @@ component_configuration
   ;
 
 component_declaration
-  : COMPONENT identifier IS? local_generic_clause? local_port_clause? END COMPONENT component_simple_name? SEMICOLON
+  : COMPONENT identifier IS? /*local_*/generic_clause? /*local_*/port_clause? END COMPONENT /*component_*/simple_name? SEMICOLON
   ;
 
 component_instantiation_statement
@@ -416,7 +418,7 @@ component_instantiation_statement
   ;
 
 component_specification
-  : instantiation_list COLON component_name
+  : instantiation_list COLON /*component_*/name
   ;
 
 composite_type_definition
@@ -448,7 +450,7 @@ concurrent_statement
   ;
 
 condition
-  : boolean_expression
+  : /*boolean_*/expression
   ;
 
 condition_clause
@@ -464,7 +466,7 @@ conditional_waveforms
   ;
 
 configuration_declaration
-  : CONFIGURATION identifier OF entity_name IS configuration_declarative_part block_configuration END CONFIGURATION? configuration_simple_name? SEMICOLON
+  : CONFIGURATION identifier OF /*entity_*/name IS configuration_declarative_part block_configuration END CONFIGURATION? /*configuration_*/simple_name? SEMICOLON
   ;
 
 configuration_declarative_item
@@ -491,7 +493,7 @@ constant_declaration
   ;
 
 constrained_array_definition
-  : ARRAY index_constraint OF element_subtype_indication
+  : ARRAY index_constraint OF /*element_*/subtype_indication
   ;
 
 constraint
@@ -530,7 +532,7 @@ declaration
 
 delay_mechanism
   : TRANSPORT
-  | ( REJECT time_expression )? INERTIAL
+  | ( REJECT /*time_*/expression )? INERTIAL
   ;
 
 design_file
@@ -552,11 +554,11 @@ direction
   ;
 
 disconnection_specification
-  : DISCONNECT guarded_signal_specification AFTER time_expression SEMICOLON
+  : DISCONNECT guarded_signal_specification AFTER /*time_*/expression SEMICOLON
   ;
 
 discrete_range
-  : discrete_subtype_indication
+  : /*discrete_*/subtype_indication
   | range
   ;
 
@@ -573,8 +575,8 @@ element_subtype_definition
   ;
 
 entity_aspect
-  : ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
-  | CONFIGURATION configuration_name
+  : ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  | CONFIGURATION /*configuration_*/name
   | OPEN
   ;
 
@@ -607,7 +609,7 @@ entity_class_entry_list
   ;
 
 entity_declaration
-  : ENTITY identifier IS entity_header entity_declarative_part ( BEGIN entity_statement_part )? END ENTITY? entity_simple_name? SEMICOLON
+  : ENTITY identifier IS entity_header entity_declarative_part ( BEGIN entity_statement_part )? END ENTITY? /*entity_*/simple_name? SEMICOLON
   ;
 
 entity_declarative_item
@@ -617,7 +619,7 @@ entity_declarative_item
   | subtype_declaration
   | constant_declaration
   | signal_declaration
-  | shared_variable_declaration
+  | /*shared_*/variable_declaration
   | file_declaration
   | alias_declaration
   | attribute_declaration
@@ -637,7 +639,7 @@ entity_designator
   ;
 
 entity_header
-  : formal_generic_clause? formal_port_clause?
+  : /*formal_*/generic_clause? /*formal_*/port_clause?
   ;
 
 entity_name_list
@@ -652,8 +654,8 @@ entity_specification
 
 entity_statement
   : concurrent_assertion_statement
-  | passive_concurrent_procedure_call_statement
-  | passive_process_statement
+  | /*passive_*/concurrent_procedure_call_statement
+  | /*passive_*/process_statement
   ;
 
 entity_statement_part
@@ -713,11 +715,11 @@ file_declaration
   ;
 
 file_logical_name
-  : string_expression
+  : /*string_*/expression
   ;
 
 file_open_information
-  : ( OPEN file_open_kind_expression )? IS file_logical_name
+  : ( OPEN /*file_open_kind_*/expression )? IS file_logical_name
   ;
 
 file_type_definition
@@ -729,18 +731,20 @@ floating_type_definition
   ;
 
 formal_designator
-  : generic_name
-  | port_name
-  | parameter_name
+  : /*generic_*/name
+/*
+  | /*port_*/name
+  | /*parameter_*/name
+*/
   ;
 
 formal_parameter_list
-  : parameter_interface_list
+  : /*parameter_*/interface_list
   ;
 
 formal_part
   : formal_designator
-  | function_name LPAREN formal_designator RPAREN
+  | /*function_*/name LPAREN formal_designator RPAREN
   | type_mark LPAREN formal_designator RPAREN
   ;
 
@@ -749,7 +753,7 @@ full_type_declaration
   ;
 
 function_call
-  : function_name ( LPAREN actual_parameter_part RPAREN )?
+  : /*function_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
 
 generate_statement
@@ -757,7 +761,7 @@ generate_statement
   ;
 
 generation_scheme
-  : FOR generate_parameter_specification
+  : FOR /*generate_*/parameter_specification
   | IF condition
   ;
 
@@ -766,11 +770,11 @@ generic_clause
   ;
 
 generic_list
-  : generic_interface_list
+  : /*generic_*/interface_list
   ;
 
 generic_map_aspect
-  : GENERIC MAP LPAREN generic_association_list RPAREN
+  : GENERIC MAP LPAREN /*generic_*/association_list RPAREN
   ;
 
 graphic_character
@@ -789,7 +793,7 @@ group_constituent_list
   ;
 
 group_declaration
-  : GROUP identifier COLON group_template_name LPAREN group_constituent_list RPAREN SEMICOLON
+  : GROUP identifier COLON /*group_template_*/name LPAREN group_constituent_list RPAREN SEMICOLON
   ;
 
 group_template_declaration
@@ -797,7 +801,7 @@ group_template_declaration
   ;
 
 guarded_signal_specification
-  : guarded_signal_list COLON type_mark
+  : /*guarded_*/signal_list COLON type_mark
   ;
 
 identifier
@@ -823,7 +827,7 @@ index_constraint
 
 index_specification
   : discrete_range
-  | static_expression
+  | /*static_*/expression
   ;
 
 index_subtype_definition
@@ -835,9 +839,9 @@ indexed_name
   ;
 
 instantiated_unit
-  : COMPONENT? component_name
-  | ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
-  | CONFIGURATION configuration_name
+  : COMPONENT? /*component_*/name
+  | ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  | CONFIGURATION /*configuration_*/name
   ;
 
 instantiation_list
@@ -855,7 +859,7 @@ integer_type_definition
   ;
 
 interface_constant_declaration
-  : CONSTANT? identifier_list COLON IN? subtype_indication ( VARASGN static_expression )?
+  : CONSTANT? identifier_list COLON IN? subtype_indication ( VARASGN /*static_*/expression )?
   ;
 
 interface_declaration
@@ -878,16 +882,16 @@ interface_list
   ;
 
 interface_signal_declaration
-  : SIGNAL? identifier_list COLON mode? subtype_indication BUS? ( VARASGN static_expression )?
+  : SIGNAL? identifier_list COLON mode? subtype_indication BUS? ( VARASGN /*static_*/expression )?
   ;
 
 interface_variable_declaration
-  : VARIABLE? identifier_list COLON mode? subtype_indication ( VARASGN static_expression )?
+  : VARIABLE? identifier_list COLON mode? subtype_indication ( VARASGN /*static_*/expression )?
   ;
 
 iteration_scheme
   : WHILE condition
-  | FOR loop_parameter_specification
+  | FOR /*loop_*/parameter_specification
   ;
 
 label
@@ -986,7 +990,7 @@ options
   ;
 
 package_body
-  : PACKAGE BODY package_simple_name IS package_body_declarative_part END ( PACKAGE BODY )? package_simple_name? SEMICOLON
+  : PACKAGE BODY /*package_*/simple_name IS package_body_declarative_part END ( PACKAGE BODY )? /*package_*/simple_name? SEMICOLON
   ;
 
 package_body_declarative_item
@@ -995,7 +999,7 @@ package_body_declarative_item
   | type_declaration
   | subtype_declaration
   | constant_declaration
-  | shared_variable_declaration
+  | /*shared_*/variable_declaration
   | file_declaration
   | alias_declaration
   | use_clause
@@ -1008,7 +1012,7 @@ package_body_declarative_part
   ;
 
 package_declaration
-  : PACKAGE identifier IS package_declarative_part END PACKAGE? package_simple_name? SEMICOLON
+  : PACKAGE identifier IS package_declarative_part END PACKAGE? /*package_*/simple_name? SEMICOLON
   ;
 
 package_declarative_item
@@ -1017,7 +1021,7 @@ package_declarative_item
   | subtype_declaration
   | constant_declaration
   | signal_declaration
-  | shared_variable_declaration
+  | /*shared_*/variable_declaration
   | file_declaration
   | alias_declaration
   | component_declaration
@@ -1038,11 +1042,11 @@ parameter_specification
   ;
 
 physical_literal
-  : abstract_literal? unit_name
+  : abstract_literal? /*unit_*/name
   ;
 
 physical_type_definition
-  : range_constraint UNITS base_unit_declaration secondary_unit_declaration* END UNITS ( physical_type_simple_name )?
+  : range_constraint UNITS base_unit_declaration secondary_unit_declaration* END UNITS ( /*physical_type_*/simple_name )?
   ;
 
 port_clause
@@ -1050,7 +1054,7 @@ port_clause
   ;
 
 port_list
-  : port_interface_list
+  : /*port_*/interface_list
   ;
 
 port_map_aspect
@@ -1080,7 +1084,7 @@ primary_unit
   ;
 
 procedure_call
-  : procedure_name ( LPAREN actual_parameter_part RPAREN )?
+  : /*procedure_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
 
 procedure_call_statement
@@ -1121,7 +1125,7 @@ qualified_expression
   ;
 
 range
-  : range_attribute_name
+  : /*range_*/attribute_name
   | simple_expression direction simple_expression
   ;
 
@@ -1130,7 +1134,7 @@ range_constraint
   ;
 
 record_type_definition
-  : RECORD element_declaration element_declaration* END RECORD record_type_simple_name?
+  : RECORD element_declaration element_declaration* END RECORD /*record_type_*/simple_name?
   ;
 
 relation
@@ -1187,7 +1191,7 @@ sensitivity_clause
   ;
 
 sensitivity_list
-  : signal_name ( COMMA signal_name )*
+  : /*signal_*/name ( COMMA /*signal_*/name )*
   ;
 
 sequence_of_statements
@@ -1241,7 +1245,7 @@ signal_kind
   ;
 
 signal_list
-  : signal_name ( COMMA signal_name )*
+  : /*signal_*/name ( COMMA /*signal_*/name )*
   | OTHERS
   | ALL
   ;
@@ -1311,7 +1315,7 @@ subtype_declaration
   ;
 
 subtype_indication
-  : resolution_function_name? type_mark constraint?
+  : */resolution_function_*/name? type_mark constraint?
   ;
 
 suffix
@@ -1331,7 +1335,7 @@ term
   ;
 
 timeout_clause
-  : FOR time_expression
+  : FOR /*time_*/expression
   ;
 
 type_conversion
@@ -1351,12 +1355,14 @@ type_definition
   ;
 
 type_mark
-  : type_name
-  | subtype_name
+  : /*type_*/name
+/*
+  | /*subtype_/*name
+*/
   ;
 
 unconstrained_array_definition
-  : ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN OF element_subtype_indication
+  : ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN OF /*element_*/subtype_indication
   ;
 
 use_clause
@@ -1381,7 +1387,7 @@ waveform
   ;
 
 waveform_element
-  : value_expression ( AFTER time_expression )?
-  | NULL ( AFTER time_expression )?
+  : /*value_*/expression ( AFTER /*time_*/expression )?
+  | NULL ( AFTER /*time_*/expression )?
   ;
 
