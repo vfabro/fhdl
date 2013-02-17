@@ -996,7 +996,7 @@ slice_name
 
 /* LRM IEEE Std 1076-1993 6.6 */
 attribute_name
-  : prefix ( signature )? ' attribute_designator ( LPAREN expression RPAREN )?
+  : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?
   ;
 
 attribute_designator
@@ -1137,9 +1137,9 @@ actual_parameter_part
 
 
 /* LRM IEEE Std 1076-1993 7.3.4 */
-qualified_expression // TODO replace ' with TICK token
-  : type_mark ' LPAREN expression RPAREN
-  | type_mark ' aggregate
+qualified_expression
+  : type_mark SQUOTE LPAREN expression RPAREN
+  | type_mark SQUOTE aggregate
   ;
 
 
