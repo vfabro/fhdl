@@ -154,15 +154,7 @@ WITH: 'with';
 XNOR: 'xnor';
 XOR: 'xor';
 
-
-
 /*
-TODO:
-
-replace [ ] WITH LSB and RSB
-replace ( ) WITH LPAREN and RPAREN
-replace { } WITH ()? or ?
-
 p174 -> keywords as names !!! twisted to implement
 
 If a backslash is to be used as one of the graphic characters of an extended literal, it must be doubled. All
@@ -184,158 +176,89 @@ VHDL
 
 */
 
-abstract_literal
-  : decimal_literal
-  | based_literal
+
+/* LRM IEEE Std 1076-1993 1.1 */
+entity_declaration
+  : ENTITY identifier IS
+      entity_header
+      entity_declarative_part
+    ( BEGIN entity_statement_part )?
+      END ENTITY? /*entity_*/simple_name? SEMICOLON
   ;
 
-access_type_definition
-  : ACCESS subtype_indication
+
+/* LRM IEEE Std 1076-1993 1.1.1 */
+entity_header
+  : /*formal_*/generic_clause?
+    /*formal_*/port_clause?
   ;
 
-actual_designator
-  : expression
-  | signal_name
-  | variable_name
-  | file_name
-  | OPEN
+generic_clause
+  : GENERIC LPAREN generic_list RPAREN SEMICOLON
   ;
 
-actual_parameter_part
-  : parameter_association_list
+port_clause
+  : PORT LPAREN port_list RPAREN SEMICOLON
   ;
 
-actual_part
-  : actual_designator
-  | function_name LPAREN actual_designator RPAREN
-  | type_mark LPAREN actual_designator RPAREN
+generic_list
+  : /*generic_*/interface_list
   ;
 
-adding_operator
-  : PLUS
-  | MINUS
-  | CONCAT
+port_list
+  : /*port_*/interface_list
   ;
 
-aggregate
-  : LPAREN element_association ( COMMA element_association )* RPAREN
+
+/* LRM IEEE Std 1076-1993 1.1.2 */
+entity_declarative_part
+  : entity_declarative_item*
   ;
 
-alias_declaration
-  : ALIAS alias_designator ( COLON subtype_indication )? IS name signature? SEMICOLON
+entity_declarative_item
+  : subprogram_declaration
+  | subprogram_body
+  | type_declaration
+  | subtype_declaration
+  | constant_declaration
+  | signal_declaration
+  | /*shared_*/variable_declaration
+  | file_declaration
+  | alias_declaration
+  | attribute_declaration
+  | attribute_specification
+  | disconnection_specification
+  | use_clause
+  | group_template_declaration
+  | group_declaration
   ;
 
-alias_designator
-  : identifier
-  | character_literal
-  | operator_symbol
+
+/* LRM IEEE Std 1076-1993 1.1.3 */
+entity_statement_part
+  : entity_statement*
   ;
 
-allocator
-  : NEW subtype_indication
-  | NEW qualified_expression
+entity_statement
+  : concurrent_assertion_statement
+  | /*passive_*/concurrent_procedure_call_statement
+  | /*passive_*/process_statement
   ;
 
+
+/* LRM IEEE Std 1076-1993 1.2 */
 architecture_body
-  : ARCHITECTURE identifier OF entity_name IS
-    architecture_declarative_part
-    BEGIN architecture_statement_part
+  : ARCHITECTURE identifier OF /*entity_*/name IS
+      architecture_declarative_part
+    BEGIN
+      architecture_statement_part
     END ARCHITECTURE? /*architecture_*/simple_name? SEMICOLON
   ;
 
+
+/* LRM IEEE Std 1076-1993 1.2.1 */
 architecture_declarative_part
   : block_declarative_item*
-  ;
-
-architecture_statement_part
-  : concurrent_statement*
-  ;
-
-array_type_definition
-  : unconstrained_array_definition
-  | constrained_array_definition
-  ;
-
-assertion
-  : ASSERT condition ( REPORT expression )? ( SEVERITY expression )?
-  ;
-
-assertion_statement
-  : ( label COLON )? assertion SEMICOLON
-  ;
-
-association_element
-  : ( formal_part ARROW )? actual_part
-  ;
-
-association_list :
-association_element ( COMMA association_element )*
-;
-
-attribute_declaration
-  : ATTRIBUTE identifier COLON type_mark SEMICOLON
-  ;
-
-attribute_designator
-  : attribute_simple_name
-  ;
-
-attribute_name
-  : prefix ( signature )? ' attribute_designator ( LPAREN expression RPAREN )?
-  ;
-
-attribute_specification
-  : ATTRIBUTE attribute_designator OF entity_specification IS expression SEMICOLON
-  ;
-
-base
-  : integer
-  ;
-
-base_specifier
-  : B
-  | O
-  | X
-  ;
-
-base_unit_declaration
-  : identifier SEMICOLON
-  ;
-
-based_integer
-  : extended_digit ( underline? extended_digit )*
-  ;
-
-based_literal
-  : base # based_integer ( . based_integer )? # exponent?
-  ;
-
-basic_character
-  : basic_graphic_character | format_effector
-  ;
-
-basic_graphic_character
-  : upper_case_letter | digit | special_character| space_character
-;
-
-basic_identifier
-  : letter ( underline? letter_or_digit )*
-  ;
-
-binding_indication
-  : ( USE entity_aspect )? generic_map_aspect? port_map_aspect?
-  ;
-
-bit_string_literal
-  : base_specifier " bit_value? "
-  ;
-
-bit_value
-  : extended_digit ( underline? extended_digit )*
-  ;
-
-block_configuration
-  : FOR block_specification use_clause* configuration_item* END FOR SEMICOLON
   ;
 
 block_declarative_item
@@ -345,7 +268,7 @@ block_declarative_item
   | subtype_declaration
   | constant_declaration
   | signal_declaration
-  | shared_variable_declaration
+  | /*shared_*/variable_declaration
   | file_declaration
   | alias_declaration
   | component_declaration
@@ -358,113 +281,23 @@ block_declarative_item
   | group_declaration
   ;
 
-block_declarative_part
-  : block_declarative_item*
-  ;
 
-block_header
-  : ( generic_clause ( generic_map_aspect SEMICOLON )? )? ( port_clause ( port_map_aspect SEMICOLON )? )?
-  ;
-
-block_specification
-  : architecture_name
-  | /*block_statement_*/label
-  | /*generate_statement_*/label ( LPAREN index_specification RPAREN )?
-  ;
-
-block_statement
-  : /*block_*/label COLON BLOCK ( LPAREN guard_expression RPAREN )? IS? block_header block_declarative_part BEGIN block_statement_part END BLOCK /*block_*/label? SEMICOLON
-  ;
-
-block_statement_part
+/* LRM IEEE Std 1076-1993 1.2.2 */
+architecture_statement_part
   : concurrent_statement*
   ;
 
-case_statement
-  : ( /*case_*/label COLON )? CASE expression IS case_statement_alternative case_statement_alternative* END CASE /*case_*/label? SEMICOLON
-  ;
 
-case_statement_alternative
-  : WHEN choices ARROW sequence_of_statements
-  ;
-
-character_literal
-  : ' graphic_character '
-  ;
-
-choice
-  : simple_expression
-  | discrete_range
-  | element_simple_name
-  | OTHERS
-  ;
-
-choices
-  : choice (PIPE choice )*
-  ;
-
-component_configuration
-  : FOR component_specification ( binding_indication SEMICOLON )? block_configuration? END FOR SEMICOLON
-  ;
-
-component_declaration
-  : COMPONENT identifier IS? local_generic_clause? local_port_clause? END COMPONENT component_simple_name? SEMICOLON
-  ;
-
-component_instantiation_statement
-  : /*instantiation_*/label COLON instantiated_unit generic_map_aspect? port_map_aspect? SEMICOLON
-  ;
-
-component_specification
-  : instantiation_list COLON component_name
-  ;
-
-composite_type_definition
-  : array_type_definition
-  | record_type_definition
-  ;
-
-concurrent_assertion_statement
-  : ( label COLON )? POSTPONED? assertion SEMICOLON
-  ;
-
-concurrent_procedure_call_statement
-  : ( label COLON )? POSTPONED? procedure_call SEMICOLON
-  ;
-
-concurrent_signal_assignment_statement
-  : ( label COLON )? POSTPONED? conditional_signal_assignment
-  | ( label COLON )? POSTPONED? selected_signal_assignment
-  ;
-
-concurrent_statement
-  : block_statement
-  | process_statement
-  | concurrent_procedure_call_statement
-  | concurrent_assertion_statement
-  | concurrent_signal_assignment_statement
-  | component_instantiation_statement
-  | generate_statement
-  ;
-
-condition
-  : boolean_expression
-  ;
-
-condition_clause
-  : UNTIL condition
-  ;
-
-conditional_signal_assignment
-  : target LTEQ options conditional_waveforms SEMICOLON
-  ;
-
-conditional_waveforms
-  : ( waveform WHEN condition ELSE )* waveform ( WHEN condition )?
-  ;
-
+/* LRM IEEE Std 1076-1993 1.3 */
 configuration_declaration
-  : CONFIGURATION identifier OF entity_name IS configuration_declarative_part block_configuration END CONFIGURATION? configuration_simple_name? SEMICOLON
+  : CONFIGURATION identifier OF /*entity_*/name IS
+      configuration_declarative_part
+      block_configuration
+    END CONFIGURATION? /*configuration_*/simple_name? SEMICOLON
+  ;
+
+configuration_declarative_part
+  : configuration_declarative_item*
   ;
 
 configuration_declarative_item
@@ -473,8 +306,24 @@ configuration_declarative_item
   | group_declaration
   ;
 
-configuration_declarative_part
-  : configuration_declarative_item*
+
+/* LRM IEEE Std 1076-1993 1.3.1 */
+block_configuration
+  : FOR block_specification
+      use_clause*
+      configuration_item*
+    END FOR SEMICOLON
+  ;
+
+block_specification
+  : /*architecture_*/name
+  | /*block_statement_*/label
+  | /*generate_statement_*/label ( LPAREN index_specification RPAREN )?
+  ;
+
+index_specification
+  : discrete_range
+  | /*static_*/expression
   ;
 
 configuration_item
@@ -482,36 +331,288 @@ configuration_item
   | component_configuration
   ;
 
-configuration_specification
-  : FOR component_specification binding_indication SEMICOLON
+
+/* LRM IEEE Std 1076-1993 1.3.2 */
+component_configuration
+  : FOR component_specification
+     ( binding_indication SEMICOLON )?
+     block_configuration?
+    END FOR SEMICOLON
   ;
 
-constant_declaration
-  : CONSTANT identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
+
+/* LRM IEEE Std 1076-1993 2.1 */
+subprogram_declaration
+  : subprogram_specification SEMICOLON
+  ;
+
+subprogram_specification
+  : PROCEDURE designator ( LPAREN formal_parameter_list RPAREN )?
+  | ( PURE | IMPURE )? FUNCTION designator ( LPAREN formal_parameter_list RPAREN )?
+    RETURN type_mark
+  ;
+
+designator
+  : identifier
+  | operator_symbol
+  ;
+
+operator_symbol
+  : string_literal
+  ;
+
+
+/* LRM IEEE Std 1076-1993 2.1.1 */
+formal_parameter_list
+  : /*parameter_*/interface_list
+  ;
+
+
+/* LRM IEEE Std 1076-1993 2.2 */
+subprogram_body
+  : subprogram_specification IS
+      subprogram_declarative_part
+    BEGIN
+      subprogram_statement_part
+    END subprogram_kind? designator? SEMICOLON
+  ;
+
+subprogram_declarative_part
+  : subprogram_declarative_item*
+  ;
+
+subprogram_declarative_item
+  : subprogram_declaration
+  | subprogram_body
+  | type_declaration
+  | subtype_declaration
+  | constant_declaration
+  | variable_declaration
+  | file_declaration
+  | alias_declaration
+  | attribute_declaration
+  | attribute_specification
+  | use_clause
+  | group_template_declaration
+  | group_declaration
+  ;
+
+subprogram_statement_part
+  : sequential_statement*
+  ;
+
+subprogram_kind
+  : PROCEDURE
+  | FUNCTION
+  ;
+
+
+/* LRM IEEE Std 1076-1993 2.3.2 */
+signature
+  : ( ( type_mark ( COMMA type_mark )* )? ( RETURN type_mark )? )?
+  ;
+
+
+/* LRM IEEE Std 1076-1993 2.5 */
+package_declaration
+  : PACKAGE identifier IS
+      package_declarative_part
+    END PACKAGE? /*package_*/simple_name? SEMICOLON
+  ;
+
+package_declarative_part
+  : package_declarative_item*
+  ;
+
+package_declarative_item
+  : subprogram_declaration
+  | type_declaration
+  | subtype_declaration
+  | constant_declaration
+  | signal_declaration
+  | /*shared_*/variable_declaration
+  | file_declaration
+  | alias_declaration
+  | component_declaration
+  | attribute_declaration
+  | attribute_specification
+  | disconnection_specification
+  | use_clause
+  | group_template_declaration
+  | group_declaration
+  ;
+
+
+/* LRM IEEE Std 1076-1993 2.6 */
+package_body
+  : PACKAGE BODY /*package_*/simple_name IS
+      package_body_declarative_part
+    END ( PACKAGE BODY )? /*package_*/simple_name? SEMICOLON
+  ;
+
+package_body_declarative_part
+  : package_body_declarative_item*
+  ;
+
+package_body_declarative_item
+  : subprogram_declaration
+  | subprogram_body
+  | type_declaration
+  | subtype_declaration
+  | constant_declaration
+  | /*shared_*/variable_declaration
+  | file_declaration
+  | alias_declaration
+  | use_clause
+  | group_template_declaration
+  | group_declaration
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.1 */
+scalar_type_definition
+  : enumeration_type_definition
+  | integer_type_definition
+  | floating_type_definition
+  | physical_type_definition
+  ;
+
+range_constraint
+  : RANGE_KW range
+  ;
+
+range
+  : /*range_*/attribute_name
+  | simple_expression direction simple_expression
+  ;
+
+direction
+  : TO
+  | DOWNTO
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.1.1 */
+enumeration_type_definition
+  : LPAREN enumeration_literal ( COMMA enumeration_literal )* RPAREN
+  ;
+
+enumeration_literal
+  : identifier
+  | character_literal
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.1.2 */
+integer_type_definition
+  : range_constraint
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.1.3 */
+physical_type_definition
+  : range_constraint
+      UNITS
+        base_unit_declaration
+        secondary_unit_declaration*
+      END UNITS ( /*physical_type_*/simple_name )?
+  ;
+
+base_unit_declaration
+  : identifier SEMICOLON // Weird: semicolon might be removed
+  ;
+
+secondary_unit_declaration
+  : identifier EQ physical_literal SEMICOLON
+  ;
+
+physical_literal
+  : abstract_literal? /*unit_*/name
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.1.4 */
+floating_type_definition
+  : range_constraint
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.2 */
+composite_type_definition
+  : array_type_definition
+  | record_type_definition
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.2.1 */
+array_type_definition
+  : unconstrained_array_definition
+  | constrained_array_definition
+  ;
+
+unconstrained_array_definition
+  : ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN
+    OF /*element_*/subtype_indication
   ;
 
 constrained_array_definition
-  : ARRAY index_constraint OF element_subtype_indication
+  : ARRAY index_constraint OF /*element_*/subtype_indication
   ;
 
-constraint
-  : range_constraint
-  | index_constraint
+index_subtype_definition
+  : type_mark RANGE_KW BOX
   ;
 
-context_clause
-  : context_item*
+index_constraint
+  : LPAREN discrete_range ( COMMA discrete_range )* RPAREN
   ;
 
-context_item
-  : library_clause
-  | use_clause
+discrete_range
+  : /*discrete_*/subtype_indication
+  | range
   ;
 
-decimal_literal
-  : integer ( . integer )? exponent?
+
+/* LRM IEEE Std 1076-1993 3.2.2 */
+record_type_definition
+  : RECORD
+      element_declaration
+      element_declaration*
+    END RECORD /*record_type_*/simple_name?
   ;
 
+element_declaration
+  : identifier_list COLON element_subtype_definition SEMICOLON
+  ;
+
+identifier_list
+  : identifier ( COMMA identifier )*
+  ;
+
+element_subtype_definition
+  : subtype_indication
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.3 */
+access_type_definition
+  : ACCESS subtype_indication
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.3.1 */
+incomplete_type_declaration
+  : TYPE identifier SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 3.4 */
+file_type_definition
+  : FILE OF type_mark
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4 */
 declaration
   : type_declaration
   | subtype_declaration
@@ -528,54 +629,231 @@ declaration
   | package_declaration
   ;
 
-delay_mechanism
-  : TRANSPORT
-  | ( REJECT time_expression )? INERTIAL
+
+/* LRM IEEE Std 1076-1993 4.1 */
+type_declaration
+  : full_type_declaration
+  | incomplete_type_declaration
   ;
 
-design_file
-  : design_unit design_unit*
+full_type_declaration
+  : TYPE identifier IS type_definition SEMICOLON
   ;
 
-design_unit
-  : context_clause library_unit
+type_definition
+  : scalar_type_definition
+  | composite_type_definition
+  | access_type_definition
+  | file_type_definition
   ;
 
-designator
+
+/* LRM IEEE Std 1076-1993 4.2 */
+subtype_declaration
+  : SUBTYPE identifier IS subtype_indication SEMICOLON
+  ;
+
+subtype_indication
+  : */resolution_function_*/name? type_mark constraint?
+  ;
+
+type_mark
+  : /*type_*/name
+/*
+  | /*subtype_/*name
+*/
+  ;
+
+constraint
+  : range_constraint
+  | index_constraint
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4.3.1 */
+object_declaration
+  : constant_declaration
+  | signal_declaration
+  | variable_declaration
+  | file_declaration
+  ;
+
+constant_declaration
+  : CONSTANT identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
+  ;
+
+signal_declaration
+  : SIGNAL identifier_list COLON subtype_indication signal_kind? ( VARASGN expression )? SEMICOLON
+  ;
+
+signal_kind
+  : REGISTER
+  | BUS
+  ;
+
+variable_declaration
+  : SHARED? VARIABLE identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
+  ;
+
+file_declaration
+  : FILE identifier_list COLON subtype_indication file_open_information? SEMICOLON
+  ;
+
+file_logical_name
+  : /*string_*/expression
+  ;
+
+file_open_information
+  : ( OPEN /*file_open_kind_*/expression )? IS file_logical_name
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4.3.2 */
+interface_declaration
+  : interface_constant_declaration
+  | interface_signal_declaration
+  | interface_variable_declaration
+  | interface_file_declaration
+  ;
+
+interface_constant_declaration
+  : CONSTANT? identifier_list COLON IN? subtype_indication ( VARASGN /*static_*/expression )?
+  ;
+
+interface_signal_declaration
+  : SIGNAL? identifier_list COLON mode? subtype_indication BUS? ( VARASGN /*static_*/expression )?
+  ;
+
+interface_variable_declaration
+  : VARIABLE? identifier_list COLON mode? subtype_indication ( VARASGN /*static_*/expression )?
+  ;
+
+interface_file_declaration
+  : FILE identifier_list COLON subtype_indication
+  ;
+
+mode
+  : IN
+  | OUT
+  | INOUT
+  | BUFFER
+  | LINKAGE
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4.3.2.1 */
+interface_list
+  : interface_element ( SEMICOLON interface_element )*
+  ;
+
+interface_element
+  : interface_declaration
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4.3.2.2 */
+association_list
+  : association_element ( COMMA association_element )*
+  ;
+
+association_element
+  : ( formal_part ARROW )? actual_part
+  ;
+
+formal_part
+  : formal_designator
+  | /*function_*/name LPAREN formal_designator RPAREN
+  | type_mark LPAREN formal_designator RPAREN
+  ;
+
+formal_designator
+  : /*generic_*/name
+/*
+  | /*port_*/name
+  | /*parameter_*/name
+*/
+  ;
+
+actual_part
+  : actual_designator
+  | /*function_*/name LPAREN actual_designator RPAREN
+  | type_mark LPAREN actual_designator RPAREN
+  ;
+
+actual_designator
+  : expression
+  | /*signal_*/name
+/*
+  | /*variable_*/name
+  | /*file_*/name
+*/
+  | OPEN
+  ;
+
+
+/* LRM IEEE Std 1076-1993 4.3.3 */
+alias_declaration
+  : ALIAS alias_designator ( COLON subtype_indication )? IS name signature? SEMICOLON
+  ;
+
+alias_designator
   : identifier
+  | character_literal
   | operator_symbol
   ;
 
-direction
-  : TO
-  | DOWNTO
+
+/* LRM IEEE Std 1076-1993 4.4 */
+attribute_declaration
+  : ATTRIBUTE identifier COLON type_mark SEMICOLON
   ;
 
-disconnection_specification
-  : DISCONNECT guarded_signal_specification AFTER time_expression SEMICOLON
+
+/* LRM IEEE Std 1076-1993 4.5 */
+component_declaration
+  : COMPONENT identifier IS?
+      /*local_*/generic_clause?
+      /*local_*/port_clause?
+    END COMPONENT /*component_*/simple_name? SEMICOLON
   ;
 
-discrete_range
-  : discrete_subtype_indication
-  | range
+
+/* LRM IEEE Std 1076-1993 4.6 */
+group_template_declaration
+  : GROUP identifier IS LPAREN entity_class_entry_list RPAREN SEMICOLON
   ;
 
-element_association
-  : ( choices ARROW )? expression
+entity_class_entry_list
+  : entity_class_entry ( COMMA entity_class_entry )*
   ;
 
-element_declaration
-  : identifier_list COLON element_subtype_definition SEMICOLON
+entity_class_entry
+  : entity_class BOX?
   ;
 
-element_subtype_definition
-  : subtype_indication
+
+/* LRM IEEE Std 1076-1993 4.7 */
+group_declaration
+  : GROUP identifier COLON /*group_template_*/name LPAREN group_constituent_list RPAREN SEMICOLON
   ;
 
-entity_aspect
-  : ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
-  | CONFIGURATION configuration_name
-  | OPEN
+group_constituent_list
+  : group_constituent ( COMMA group_constituent )*
+  ;
+
+group_constituent
+  : name
+  | character_literal
+  ;
+
+
+/* LRM IEEE Std 1076-1993 5.1 */
+attribute_specification
+  : ATTRIBUTE attribute_designator OF entity_specification IS expression SEMICOLON
+  ;
+
+entity_specification
+  : entity_name_list COLON entity_class
   ;
 
 entity_class
@@ -598,66 +876,14 @@ entity_class
   | UNITS
   ;
 
-entity_class_entry
-  : entity_class LTGT?
-  ;
-
-entity_class_entry_list
-  : entity_class_entry ( COMMA entity_class_entry )*
-  ;
-
-entity_declaration
-  : ENTITY identifier IS entity_header entity_declarative_part ( BEGIN entity_statement_part )? END ENTITY? entity_simple_name? SEMICOLON
-  ;
-
-entity_declarative_item
-  : subprogram_declaration
-  | subprogram_body
-  | type_declaration
-  | subtype_declaration
-  | constant_declaration
-  | signal_declaration
-  | shared_variable_declaration
-  | file_declaration
-  | alias_declaration
-  | attribute_declaration
-  | attribute_specification
-  | disconnection_specification
-  | use_clause
-  | group_template_declaration
-  | group_declaration
-  ;
-
-entity_declarative_part
-  : entity_declarative_item*
-  ;
-
-entity_designator
-  : entity_tag signature?
-  ;
-
-entity_header
-  : formal_generic_clause? formal_port_clause?
-  ;
-
 entity_name_list
   : entity_designator ( COMMA entity_designator )*
   | OTHERS
   | ALL
   ;
 
-entity_specification
-  : entity_name_list COLON entity_class
-  ;
-
-entity_statement
-  : concurrent_assertion_statement
-  | passive_concurrent_procedure_call_statement
-  | passive_process_statement
-  ;
-
-entity_statement_part
-  : entity_statement*
+entity_designator
+  : entity_tag signature?
   ;
 
 entity_tag
@@ -666,178 +892,14 @@ entity_tag
   | operator_symbol
   ;
 
-enumeration_literal
-  : identifier
-  | character_literal
+
+/* LRM IEEE Std 1076-1993 5.2 */
+configuration_specification
+  : FOR component_specification binding_indication SEMICOLON
   ;
 
-enumeration_type_definition
-  : LPAREN enumeration_literal ( COMMA enumeration_literal )* RPAREN
-  ;
-
-exit_statement
-  : ( label COLON )? EXIT /*loop_*/label? ( WHEN condition )? SEMICOLON
-  ;
-
-exponent
-  : E PLUS? integer
-  | E MINUS integer
-  ;
-
-expression
-  : relation ( AND relation )*
-  | relation ( OR relation )*
-  | relation ( XOR relation )*
-  | relation ( NAND relation )?
-  | relation ( NOR relation )?
-  | relation ( XNOR relation )*
-  ;
-
-extended_digit
-  : digit
-  | letter
-  ;
-
-extended_identifier
-  : \ graphic_character graphic_character* \
-  ;
-
-factor
-  : primary ( EXPO primary )?
-  | ABS primary
-  | NOT primary
-  ;
-
-file_declaration
-  : FILE identifier_list COLON subtype_indication file_open_information? SEMICOLON
-  ;
-
-file_logical_name
-  : string_expression
-  ;
-
-file_open_information
-  : ( OPEN file_open_kind_expression )? IS file_logical_name
-  ;
-
-file_type_definition
-  : FILE OF type_mark
-  ;
-
-floating_type_definition
-  : range_constraint
-  ;
-
-formal_designator
-  : generic_name
-  | port_name
-  | parameter_name
-  ;
-
-formal_parameter_list
-  : parameter_interface_list
-  ;
-
-formal_part
-  : formal_designator
-  | function_name LPAREN formal_designator RPAREN
-  | type_mark LPAREN formal_designator RPAREN
-  ;
-
-full_type_declaration
-  : TYPE identifier IS type_definition SEMICOLON
-  ;
-
-function_call
-  : function_name ( LPAREN actual_parameter_part RPAREN )?
-  ;
-
-generate_statement
-  : /*generate_*/label COLON generation_scheme GENERATE ( block_declarative_item* BEGIN )? concurrent_statement* END GENERATE /*generate_*/label? SEMICOLON
-  ;
-
-generation_scheme
-  : FOR generate_parameter_specification
-  | IF condition
-  ;
-
-generic_clause
-  : GENERIC LPAREN generic_list RPAREN SEMICOLON
-  ;
-
-generic_list
-  : generic_interface_list
-  ;
-
-generic_map_aspect
-  : GENERIC MAP LPAREN generic_association_list RPAREN
-  ;
-
-graphic_character
-  : basic_graphic_character
-  | lower_case_letter
-  | other_special_character
-  ;
-
-group_constituent
-  : name
-  | character_literal
-  ;
-
-group_constituent_list
-  : group_constituent ( COMMA group_constituent )*
-  ;
-
-group_declaration
-  : GROUP identifier COLON group_template_name LPAREN group_constituent_list RPAREN SEMICOLON
-  ;
-
-group_template_declaration
-  : GROUP identifier IS LPAREN entity_class_entry_list RPAREN SEMICOLON
-  ;
-
-guarded_signal_specification
-  : guarded_signal_list COLON type_mark
-  ;
-
-identifier
-  : basic_identifier
-  | extended_identifier
-  ;
-
-identifier_list
-  : identifier ( COMMA identifier )*
-  ;
-
-if_statement
-  : ( /*if_*/label COLON )? IF condition THEN sequence_of_statements ( ELSIF condition THEN sequence_of_statements )* ( ELSE sequence_of_statements )? END IF /*if_*/label? SEMICOLON
-  ;
-
-incomplete_type_declaration
-  : TYPE identifier SEMICOLON
-  ;
-
-index_constraint
-  : LPAREN discrete_range ( COMMA discrete_range )* RPAREN
-  ;
-
-index_specification
-  : discrete_range
-  | static_expression
-  ;
-
-index_subtype_definition
-  : type_mark RANGE_KW LTGT
-  ;
-
-indexed_name
-  : prefix LPAREN expression ( COMMA expression )* RPAREN
-  ;
-
-instantiated_unit
-  : COMPONENT? component_name
-  | ENTITY entity_name ( LPAREN architecture_identifier RPAREN )?
-  | CONFIGURATION configuration_name
+component_specification
+  : instantiation_list COLON /*component_*/name
   ;
 
 instantiation_list
@@ -846,108 +908,46 @@ instantiation_list
   | ALL
   ;
 
-integer
-  : digit ( underline? digit )*
+
+/* LRM IEEE Std 1076-1993 5.2.1 */
+binding_indication
+  : ( USE entity_aspect )?
+    generic_map_aspect?
+    port_map_aspect?
   ;
 
-integer_type_definition
-  : range_constraint
+entity_aspect
+  : ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  | CONFIGURATION /*configuration_*/name
+  | OPEN
   ;
 
-interface_constant_declaration
-  : CONSTANT? identifier_list COLON IN? subtype_indication ( VARASGN static_expression )?
+generic_map_aspect
+  : GENERIC MAP LPAREN /*generic_*/association_list RPAREN
   ;
 
-interface_declaration
-  : interface_constant_declaration
-  | interface_signal_declaration
-  | interface_variable_declaration
-  | interface_file_declaration
+port_map_aspect
+  : PORT MAP LPAREN port_association_list RPAREN
   ;
 
-interface_element
-  : interface_declaration
+
+/* LRM IEEE Std 1076-1993 5.3 */
+disconnection_specification
+  : DISCONNECT guarded_signal_specification AFTER /*time_*/expression SEMICOLON
   ;
 
-interface_file_declaration
-  : FILE identifier_list COLON subtype_indication
+guarded_signal_specification
+  : /*guarded_*/signal_list COLON type_mark
   ;
 
-interface_list
-  : interface_element ( SEMICOLON interface_element )*
+signal_list
+  : /*signal_*/name ( COMMA /*signal_*/name )*
+  | OTHERS
+  | ALL
   ;
 
-interface_signal_declaration
-  : SIGNAL? identifier_list COLON mode? subtype_indication BUS? ( VARASGN static_expression )?
-  ;
 
-interface_variable_declaration
-  : VARIABLE? identifier_list COLON mode? subtype_indication ( VARASGN static_expression )?
-  ;
-
-iteration_scheme
-  : WHILE condition
-  | FOR loop_parameter_specification
-  ;
-
-label
-  : identifier
-  ;
-
-letter
-  : upper_case_letter
-  | lower_case_letter
-  ;
-
-letter_or_digit
-  : letter
-  | digit
-  ;
-
-library_clause
-  : LIBRARY logical_name_list SEMICOLON
-  ;
-
-library_unit
-  : primary_unit
-  | secondary_unit
-  ;
-
-LITERAL
-  : numeric_literal
-  | enumeration_literal
-  | string_literal
-  | bit_string_literal
-  | NULL
-  ;
-
-logical_name
-  : identifier
-  ;
-
-logical_name_list
-  : logical_name ( COMMA logical_name )*
-  ;
-
-loop_statement
-  : ( /*loop_*/label COLON )? ( iteration_scheme )? LOOP sequence_of_statements END LOOP /*loop_*/label? SEMICOLON
-  ;
-
-mode
-  : IN
-  | OUT
-  | INOUT
-  | BUFFER
-  | LINKAGE
-  ;
-
-multiplying_operator
-  : STAR
-  | SLASH
-  | MOD
-  | REM
-  ;
-
+/* LRM IEEE Std 1076-1993 6.1 */
 name
   : simple_name
   | operator_symbol
@@ -957,109 +957,83 @@ name
   | attribute_name
   ;
 
-next_statement
-  : ( label COLON )? NEXT /*loop_*/label? ( WHEN condition )? SEMICOLON
-  ;
-
-null_statement
-  : ( label COLON )? NULL SEMICOLON
-  ;
-
-numeric_literal
-  : abstract_literal
-  | physical_literal
-  ;
-
-object_declaration
-  : constant_declaration
-  | signal_declaration
-  | variable_declaration
-  | file_declaration
-  ;
-
-operator_symbol
-  : string_literal
-  ;
-
-options
-  : GUARDED? delay_mechanism?
-  ;
-
-package_body
-  : PACKAGE BODY package_simple_name IS package_body_declarative_part END ( PACKAGE BODY )? package_simple_name? SEMICOLON
-  ;
-
-package_body_declarative_item
-  : subprogram_declaration
-  | subprogram_body
-  | type_declaration
-  | subtype_declaration
-  | constant_declaration
-  | shared_variable_declaration
-  | file_declaration
-  | alias_declaration
-  | use_clause
-  | group_template_declaration
-  | group_declaration
-  ;
-
-package_body_declarative_part
-  : package_body_declarative_item*
-  ;
-
-package_declaration
-  : PACKAGE identifier IS package_declarative_part END PACKAGE? package_simple_name? SEMICOLON
-  ;
-
-package_declarative_item
-  : subprogram_declaration
-  | type_declaration
-  | subtype_declaration
-  | constant_declaration
-  | signal_declaration
-  | shared_variable_declaration
-  | file_declaration
-  | alias_declaration
-  | component_declaration
-  | attribute_declaration
-  | attribute_specification
-  | disconnection_specification
-  | use_clause
-  | group_template_declaration
-  | group_declaration
-  ;
-
-package_declarative_part
-  : package_declarative_item*
-  ;
-
-parameter_specification
-  : identifier IN discrete_range
-  ;
-
-physical_literal
-  : abstract_literal? unit_name
-  ;
-
-physical_type_definition
-  : range_constraint UNITS base_unit_declaration secondary_unit_declaration* END UNITS ( physical_type_simple_name )?
-  ;
-
-port_clause
-  : PORT LPAREN port_list RPAREN SEMICOLON
-  ;
-
-port_list
-  : port_interface_list
-  ;
-
-port_map_aspect
-  : PORT MAP LPAREN port_association_list RPAREN
-  ;
-
 prefix
   : name
   | function_call
+  ;
+
+
+/* LRM IEEE Std 1076-1993 6.2 */
+simple_name
+  : identifier
+  ;
+
+
+/* LRM IEEE Std 1076-1993 6.3 */
+selected_name
+  : prefix DOT suffix
+  ;
+
+suffix
+  : simple_name
+  | character_literal
+  | operator_symbol
+  | ALL
+  ;
+
+
+/* LRM IEEE Std 1076-1993 6.4 */
+indexed_name
+  : prefix LPAREN expression ( COMMA expression )* RPAREN
+  ;
+
+
+/* LRM IEEE Std 1076-1993 6.5 */
+slice_name
+  : prefix LPAREN discrete_range RPAREN
+  ;
+
+
+/* LRM IEEE Std 1076-1993 6.6 */
+attribute_name
+  : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?
+  ;
+
+attribute_designator
+  : /*attribute_*/simple_name
+  ;
+
+
+/* LRM IEEE Std 1076-1993 7.1 */
+expression
+  : relation ( AND relation )*
+  | relation ( OR relation )*
+  | relation ( XOR relation )*
+  | relation ( NAND relation )?
+  | relation ( NOR relation )?
+  | relation ( XNOR relation )*
+  ;
+
+relation
+  : shift_expression ( relational_operator shift_expression )?
+  ;
+
+shift_expression
+  : simple_expression ( shift_operator simple_expression )?
+  ;
+
+simple_expression
+  : sign? term ( adding_operator term )*
+  ;
+
+term
+  : factor ( multiplying_operator factor )*
+  ;
+
+factor
+  : primary ( EXPO primary )?
+  | ABS primary
+  | NOT primary
   ;
 
 primary
@@ -1073,69 +1047,9 @@ primary
   | LPAREN expression RPAREN
   ;
 
-primary_unit
-  : entity_declaration
-  | configuration_declaration
-  | package_declaration
-  ;
 
-procedure_call
-  : procedure_name ( LPAREN actual_parameter_part RPAREN )?
-  ;
-
-procedure_call_statement
-  : ( label COLON )? procedure_call SEMICOLON
-  ;
-
-process_declarative_item
-  : subprogram_declaration
-  | subprogram_body
-  | type_declaration
-  | subtype_declaration
-  | constant_declaration
-  | variable_declaration
-  | file_declaration
-  | alias_declaration
-  | attribute_declaration
-  | attribute_specification
-  | use_clause
-  | group_template_declaration
-  | group_declaration
-  ;
-
-process_declarative_part
-  : process_declarative_item*
-  ;
-
-process_statement
-  : ( /*process_*/label COLON )? POSTPONED? PROCESS ( LPAREN sensitivity_list RPAREN )? IS? process_declarative_part BEGIN process_statement_part END POSTPONED? PROCESS /*process_*/label? SEMICOLON
-  ;
-
-process_statement_part
-  : sequential_statement*
-  ;
-
-qualified_expression
-  : type_mark ' LPAREN expression RPAREN
-  | type_mark ' aggregate
-  ;
-
-range
-  : range_attribute_name
-  | simple_expression direction simple_expression
-  ;
-
-range_constraint
-  : RANGE_KW range
-  ;
-
-record_type_definition
-  : RECORD element_declaration element_declaration* END RECORD record_type_simple_name?
-  ;
-
-relation
-  : shift_expression ( relational_operator shift_expression )?
-  ;
+/* LRM IEEE Std 1076-1993 7.2 */
+// logical_operator rule omitted: already embedded into expression rule
 
 relational_operator
   : EQ
@@ -1146,50 +1060,103 @@ relational_operator
   | GTEQ
   ;
 
-report_statement
-  : ( label COLON )? REPORT expression ( SEVERITY expression )? SEMICOLON
+shift_operator
+  : SLL
+  | SRL
+  | SLA
+  | SRA
+  | ROL
+  | ROR
   ;
 
-return_statement
-  : ( label COLON )? RETURN expression? SEMICOLON
+adding_operator
+  : PLUS
+  | MINUS
+  | CONCAT
   ;
 
-scalar_type_definition
-  : enumeration_type_definition
-  | integer_type_definition
-  | floating_type_definition
-  | physical_type_definition
+sign
+  : PLUS
+  | MINUS
+
+
+multiplying_operator
+  : STAR
+  | SLASH
+  | MOD
+  | REM
   ;
 
-secondary_unit
-  : architecture_body
-  | package_body
+// miscellaneous_operator rule omitted: already embedded into factor rule
+
+
+/* LRM IEEE Std 1076-1993 7.3 */
+literal
+  : numeric_literal
+  | enumeration_literal
+  | string_literal
+  | bit_string_literal
+  | NULL
   ;
 
-secondary_unit_declaration
-  : identifier EQ physical_literal SEMICOLON
+numeric_literal
+  : abstract_literal
+  | physical_literal
   ;
 
-selected_name
-  : prefix . suffix
+
+/* LRM IEEE Std 1076-1993 7.3.2 */
+aggregate
+  : LPAREN element_association ( COMMA element_association )* RPAREN
   ;
 
-selected_signal_assignment
-  : WITH expression SELECT target LTEQ options selected_waveforms SEMICOLON
+element_association
+  : ( choices ARROW )? expression
   ;
 
-selected_waveforms
-  : ( waveform WHEN choices COMMA )* waveform WHEN choices
+choices
+  : choice (PIPE choice )*
   ;
 
-sensitivity_clause
-  : ON sensitivity_list
+choice
+  : simple_expression
+  | discrete_range
+  | /*element_*/simple_name
+  | OTHERS
   ;
 
-sensitivity_list
-  : signal_name ( COMMA signal_name )*
+
+/* LRM IEEE Std 1076-1993 7.3.3 */
+function_call
+  : /*function_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
 
+actual_parameter_part
+  : /*parameter_*/association_list
+  ;
+
+
+/* LRM IEEE Std 1076-1993 7.3.4 */
+qualified_expression
+  : type_mark SQUOTE LPAREN expression RPAREN
+  | type_mark SQUOTE aggregate
+  ;
+
+
+/* LRM IEEE Std 1076-1993 7.3.5 */
+type_conversion
+  : type_mark LPAREN expression RPAREN
+  ;
+
+
+/* LRM IEEE Std 1076-1993 7.3.6 */
+allocator
+  : NEW subtype_indication
+  | NEW qualified_expression
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8 */
 sequence_of_statements
   : sequential_statement*
   ;
@@ -1210,70 +1177,220 @@ sequential_statement
   | null_statement
   ;
 
-shift_expression
-  : simple_expression ( shift_operator simple_expression )?
+
+/* LRM IEEE Std 1076-1993 8.1 */
+wait_statement
+  : ( label COLON )? WAIT sensitivity_clause? condition_clause? timeout_clause? SEMICOLON
   ;
 
-shift_operator
-  : SLL
-  | SRL
-  | SLA
-  | SRA
-  | ROL
-  | ROR
+sensitivity_clause
+  : ON sensitivity_list
   ;
 
-sign
-  : PLUS
-  | MINUS
+sensitivity_list
+  : /*signal_*/name ( COMMA /*signal_*/name )*
   ;
 
+condition_clause
+  : UNTIL condition
+  ;
+
+condition
+  : /*boolean_*/expression
+  ;
+
+timeout_clause
+  : FOR /*time_*/expression
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.2 */
+assertion_statement
+  : ( label COLON )? assertion SEMICOLON
+  ;
+
+assertion
+  : ASSERT condition
+    ( REPORT expression )?
+    ( SEVERITY expression )?
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.3 */
+report_statement
+  : ( label COLON )?
+      REPORT expression
+      ( SEVERITY expression )? SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.4 */
 signal_assignment_statement
   : ( label COLON )? target LTEQ delay_mechanism? waveform SEMICOLON
   ;
 
-signal_declaration
-  : SIGNAL identifier_list COLON subtype_indication signal_kind? ( VARASGN expression )? SEMICOLON
+delay_mechanism
+  : TRANSPORT
+  | ( REJECT /*time_*/expression )? INERTIAL
   ;
 
-signal_kind
-  : REGISTER | BUS
+target
+  : name
+  | aggregate
   ;
 
-signal_list
-  : signal_name ( COMMA signal_name )*
-  | OTHERS
-  | ALL
+waveform
+  : waveform_element ( COMMA waveform_element )*
+  | UNAFFECTED
   ;
 
-signature
-  : ( ( type_mark ( COMMA type_mark )* )? ( RETURN type_mark )? )?
+
+/* LRM IEEE Std 1076-1993 8.4.1 */
+waveform_element
+  : /*value_*/expression ( AFTER /*time_*/expression )?
+  | NULL ( AFTER /*time_*/expression )?
   ;
 
-simple_expression
-  : sign? term ( adding_operator term )*
+
+/* LRM IEEE Std 1076-1993 8.5 */
+variable_assignment_statement
+  : ( label COLON )? target VARASGN expression SEMICOLON
   ;
 
-simple_name
-  : identifier
+
+/* LRM IEEE Std 1076-1993 8.6 */
+procedure_call_statement
+  : ( label COLON )? procedure_call SEMICOLON
   ;
 
-slice_name
-  : prefix LPAREN discrete_range RPAREN
+procedure_call
+  : /*procedure_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
 
-string_literal : " graphic_character* "
-;
 
-subprogram_body
-  : subprogram_specification IS subprogram_declarative_part BEGIN subprogram_statement_part END subprogram_kind? designator? SEMICOLON
+/* LRM IEEE Std 1076-1993 8.7 */
+if_statement
+  : ( /*if_*/label COLON )?
+    IF condition THEN
+      sequence_of_statements
+      ( ELSIF condition THEN
+          sequence_of_statements )*
+      ( ELSE
+          sequence_of_statements )?
+      END IF /*if_*/label? SEMICOLON
   ;
 
-subprogram_declaration
-  : subprogram_specification SEMICOLON
+
+/* LRM IEEE Std 1076-1993 8.8 */
+case_statement
+  : ( /*case_*/label COLON )?
+    CASE expression IS
+      case_statement_alternative
+      case_statement_alternative*
+    END CASE /*case_*/label? SEMICOLON
   ;
 
-subprogram_declarative_item
+case_statement_alternative
+  : WHEN choices ARROW
+    sequence_of_statements
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.9 */
+loop_statement
+  : ( /*loop_*/label COLON )?
+    iteration_scheme? LOOP
+      sequence_of_statements
+    END LOOP /*loop_*/label? SEMICOLON
+  ;
+
+iteration_scheme
+  : WHILE condition
+  | FOR /*loop_*/parameter_specification
+  ;
+
+parameter_specification
+  : identifier IN discrete_range
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.10 */
+next_statement
+  : ( label COLON )? NEXT /*loop_*/label? ( WHEN condition )? SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.11 */
+exit_statement
+  : ( label COLON )? EXIT /*loop_*/label? ( WHEN condition )? SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.12 */
+return_statement
+  : ( label COLON )? RETURN expression? SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 8.13 */
+null_statement
+  : ( label COLON )? NULL SEMICOLON
+  ;
+
+
+/* LRM IEEE Std 1076-1993 9 */
+concurrent_statement
+  : block_statement
+  | process_statement
+  | concurrent_procedure_call_statement
+  | concurrent_assertion_statement
+  | concurrent_signal_assignment_statement
+  | component_instantiation_statement
+  | generate_statement
+  ;
+
+
+/* LRM IEEE Std 1076-1993 9.1 */
+block_statement
+  : /*block_*/label COLON BLOCK ( LPAREN /*guard_*/expression RPAREN )? IS?
+        block_header
+        block_declarative_part
+      BEGIN
+        block_statement_part
+      END BLOCK /*block_*/label? SEMICOLON
+  ;
+
+block_header
+  : ( generic_clause
+    ( generic_map_aspect SEMICOLON )? )?
+    ( port_clause
+    ( port_map_aspect SEMICOLON )? )?
+  ;
+
+block_declarative_part
+  : block_declarative_item*
+  ;
+
+block_statement_part
+  : concurrent_statement*
+  ;
+
+
+/* LRM IEEE Std 1076-1993 9.2 */
+process_statement
+  : ( /*process_*/label COLON )?
+      POSTPONED? PROCESS ( LPAREN sensitivity_list RPAREN )? IS?
+        process_declarative_part
+      BEGIN
+        process_statement_part
+      END POSTPONED? PROCESS /*process_*/label? SEMICOLON
+  ;
+
+process_declarative_part
+  : process_declarative_item*
+  ;
+
+process_declarative_item
   : subprogram_declaration
   | subprogram_body
   | type_declaration
@@ -1289,99 +1406,238 @@ subprogram_declarative_item
   | group_declaration
   ;
 
-subprogram_declarative_part
-  : subprogram_declarative_item*
-  ;
-
-subprogram_kind
-  : PROCEDURE
-  | FUNCTION
-  ;
-
-subprogram_specification
-  : PROCEDURE designator ( LPAREN formal_parameter_list RPAREN )? | ( PURE | IMPURE )? FUNCTION designator ( LPAREN formal_parameter_list RPAREN )? RETURN type_mark
-  ;
-
-subprogram_statement_part
+process_statement_part
   : sequential_statement*
   ;
 
-subtype_declaration
-  : SUBTYPE identifier IS subtype_indication SEMICOLON
+
+/* LRM IEEE Std 1076-1993 9.3 */
+concurrent_procedure_call_statement
+  : ( label COLON )? POSTPONED? procedure_call SEMICOLON
   ;
 
-subtype_indication
-  : resolution_function_name? type_mark constraint?
+
+/* LRM IEEE Std 1076-1993 9.4 */
+concurrent_assertion_statement
+  : ( label COLON )? POSTPONED? assertion SEMICOLON
   ;
 
-suffix
-  : simple_name
-  | character_literal
-  | operator_symbol
-  | ALL
+
+/* LRM IEEE Std 1076-1993 9.5 */
+concurrent_signal_assignment_statement
+  : ( label COLON )? POSTPONED? conditional_signal_assignment
+  | ( label COLON )? POSTPONED? selected_signal_assignment
   ;
 
-target
-  : name
-  | aggregate
+options
+  : GUARDED? delay_mechanism?
   ;
 
-term
-  : factor ( multiplying_operator factor )*
+
+/* LRM IEEE Std 1076-1993 9.5.1 */
+conditional_signal_assignment
+  : target LTEQ options conditional_waveforms SEMICOLON
   ;
 
-timeout_clause
-  : FOR time_expression
+conditional_waveforms
+  : ( waveform WHEN condition ELSE )* waveform ( WHEN condition )?
   ;
 
-type_conversion
-  : type_mark LPAREN expression RPAREN
+
+/* LRM IEEE Std 1076-1993 9.5.2 */
+selected_signal_assignment
+  : WITH expression SELECT target LTEQ options selected_waveforms SEMICOLON
   ;
 
-type_declaration
-  : full_type_declaration
-  | incomplete_type_declaration
+selected_waveforms
+  : ( waveform WHEN choices COMMA )* waveform WHEN choices
   ;
 
-type_definition
-  : scalar_type_definition
-  | composite_type_definition
-  | access_type_definition
-  | file_type_definition
+
+/* LRM IEEE Std 1076-1993 9.6 */
+component_instantiation_statement
+  : /*instantiation_*/label COLON
+      instantiated_unit
+        generic_map_aspect?
+        port_map_aspect? SEMICOLON
   ;
 
-type_mark
-  : type_name
-  | subtype_name
+instantiated_unit
+  : COMPONENT? /*component_*/name
+  | ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  | CONFIGURATION /*configuration_*/name
   ;
 
-unconstrained_array_definition
-  : ARRAY LPAREN index_subtype_definition ( COMMA index_subtype_definition )* RPAREN OF element_subtype_indication
+
+/* LRM IEEE Std 1076-1993 9.6 */
+generate_statement
+  : /*generate_*/label COLON
+      generation_scheme GENERATE
+        ( block_declarative_item* BEGIN )?
+        concurrent_statement*
+    END GENERATE /*generate_*/label? SEMICOLON
   ;
 
+generation_scheme
+  : FOR /*generate_*/parameter_specification
+  | IF condition
+  ;
+
+label
+  : identifier
+  ;
+
+
+/* LRM IEEE Std 1076-1993 10.4 */
 use_clause
   : USE selected_name ( COMMA selected_name )* SEMICOLON
   ;
 
-variable_assignment_statement
-  : ( label COLON )? target VARASGN expression SEMICOLON
+
+/* LRM IEEE Std 1076-1993 11.1 */
+design_file /* GRAMMAR ENTRY RULE */
+  : design_unit design_unit*
   ;
 
-variable_declaration
-  : SHARED? VARIABLE identifier_list COLON subtype_indication ( VARASGN expression )? SEMICOLON
+design_unit
+  : context_clause library_unit
   ;
 
-wait_statement
-  : ( label COLON )? WAIT sensitivity_clause? condition_clause? timeout_clause? SEMICOLON
+library_unit
+  : primary_unit
+  | secondary_unit
   ;
 
-waveform
-  : waveform_element ( COMMA waveform_element )*
-  | UNAFFECTED
+primary_unit
+  : entity_declaration
+  | configuration_declaration
+  | package_declaration
   ;
 
-waveform_element
-  : value_expression ( AFTER time_expression )?
-  | NULL ( AFTER time_expression )?
+secondary_unit
+  : architecture_body
+  | package_body
   ;
+
+
+/* LRM IEEE Std 1076-1993 11.2 */
+library_clause
+  : LIBRARY logical_name_list SEMICOLON
+  ;
+
+logical_name_list
+  : logical_name ( COMMA logical_name )*
+  ;
+
+logical_name
+  : identifier
+  ;
+
+
+/* LRM IEEE Std 1076-1993 11.3 */
+context_clause
+  : context_item*
+  ;
+
+context_item
+  : library_clause
+  | use_clause
+  ;
+
+
+/* MISC RULES : probably lexer */
+
+
+abstract_literal
+  : decimal_literal
+  | based_literal
+  ;
+
+base
+  : integer
+  ;
+
+base_specifier
+  : 'B'
+  | 'O'
+  | 'X'
+  ;
+
+based_integer
+  : extended_digit ( underline? extended_digit )*
+  ;
+
+based_literal
+  : base # based_integer ( . based_integer )? # exponent?
+  ;
+
+basic_character
+  : basic_graphic_character | format_effector
+  ;
+
+basic_graphic_character
+  : upper_case_letter | digit | special_character| space_character
+;
+
+basic_identifier
+  : letter ( underline? letter_or_digit )*
+  ;
+
+bit_string_literal
+  : base_specifier " bit_value? "
+  ;
+
+bit_value
+  : extended_digit ( underline? extended_digit )*
+  ;
+
+character_literal
+  : ' graphic_character '
+  ;
+
+decimal_literal
+  : integer ( . integer )? exponent?
+  ;
+
+exponent
+  : E PLUS? integer
+  | E MINUS integer
+  ;
+
+extended_digit
+  : digit
+  | letter
+  ;
+
+extended_identifier
+  : \ graphic_character graphic_character* \
+  ;
+
+graphic_character
+  : basic_graphic_character
+  | lower_case_letter
+  | other_special_character
+  ;
+
+identifier
+  : basic_identifier
+  | extended_identifier
+  ;
+
+integer
+  : digit ( underline? digit )*
+  ;
+
+letter
+  : upper_case_letter
+  | lower_case_letter
+  ;
+
+letter_or_digit
+  : letter
+  | digit
+  ;
+
+string_literal : " graphic_character* "
+;
 
