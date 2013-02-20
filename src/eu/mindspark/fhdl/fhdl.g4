@@ -1,34 +1,166 @@
 /*
- * To change this template, choose Tools | Templates
- * AND OPEN the template IN the editor.
+*****NOTES*****
+
+For special unicode caracters:
+In ANTLR 3, you can use the ANTLRInputStream constructor that takes an ancoding as a parameter:
+ANTLRInputStream (InputStream input, String encoding) throws IOException
+
+
+TODO: the following set of rules are mutually left-recursive: name, prefix, function_call, selected_name, indexed_name, slice_name, attribute_name
+
  */
 
 grammar fhdl;
 
-/*
-r0
-    : r1 (QM | DOT)?;
+fragment UC_LETTER  : [a-z];
+fragment LC_LETTER  : [A-Z];
+fragment DIGIT      : [0-9];
 
-r1
-    : HI SPACE PLANET
-    | HI HI PLANET
-    ;
+UPPER_CASE_LETTER: UC_LETTER;
+LOWER_CASE_LETTER: LC_LETTER;
 
-HI: 'hello';
-PLANET: 'world';
-SPACE: ' ';
-QM: '!';
-DOT: '.';
-INT : [0-9]+ ;
-WS : [ \t\r\n]+ -> skip ;
-*/
+//Other special characters ! $ % @ ? \ ^ ` { } ~ Á ¢ £ Û  ́ || ¤ ¬ © » Ç Â - ̈ ø ¡ ± 2 3 « μ ¦ ¥ ü 1 1⁄4 È 1/4 1/2 3/4 À  ́  ̧ - (soft hyphen)
+//TODO: other characters were not understood by antlrworks, so they are set 
+// aside on another text file waiting for their correct UTF-8 encoding 
+OTHER_SPECIAL_CHARACTER
+  : [!$%@?\^`{}~¢£́ ¤¬©»-̈ø¡±²³«μ¦¥ ü ́ ̧ -]
+  ;
+
+UPPERCASE_LETTER
+  : UC_LETTER //| [ËçåÌ€•®éƒæè] << utf8 '\u011'
+  //| 'í'|'ê'|'ë'|'ì'|'D'|„|'ñ'|'î'|'ï'|'Í'|'̄'|'ô'|'ò'|'ó'|†|'Y'
+  ;
+
+ABSTRACT_LITERAL //PO
+  : DECIMAL_LITERAL
+  | BASED_LITERAL
+  ;
+
+//base
+//  : INTEGER
+//  ; 
+
+fragment BASED_INTEGER // LO
+  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
+  ;
+
+fragment BASED_LITERAL //LO
+  : /*base*/ INTEGER HASHSIGN BASED_INTEGER ( . BASED_INTEGER )? HASHSIGN EXPONENT?
+  ;
+
+basic_character
+  : BASIC_GRAPHIC_CHARACTER | FORMAT_EFFECTOR
+  ;
+
+BASIC_GRAPHIC_CHARACTER
+  : UPPER_CASE_LETTER | DIGIT // | SPECIAL_CHARACTER 
+  ;
+
+fragment BASIC_IDENTIFIER
+  : LETTER ( UNDERLINE? LETTER_OR_DIGIT )*
+  ;
+
+BIT_STRING_LITERAL
+  : /*base_specifier*/ [BOX] DQUOTE BIT_VALUE? DQUOTE
+  ;
+
+/*base_specifier
+  : 'B'
+  | 'O'
+  | 'X'
+  ;*/
+
+fragment BIT_VALUE //LO
+  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
+  ;
+
+//PO
+CHARACTER_LITERAL
+  : FRAG_SQUOTE GRAPHIC_CHARACTER FRAG_SQUOTE
+  ;
+
+fragment DECIMAL_LITERAL //LO
+  : INTEGER ( DOT INTEGER )? EXPONENT?
+  ;
+
+fragment EXPONENT //LO
+  : 'E' PLUS? INTEGER
+  | 'E' MINUS INTEGER
+  ;
+
+fragment EXTENDED_DIGIT //LO
+  : DIGIT
+  | LETTER
+  ;
+
+fragment EXTENDED_IDENTIFIER
+  : BACKSLASH GRAPHIC_CHARACTER+ BACKSLASH
+  ;
+
+//TODO Tab is ASCII '\011'
+//TODO Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage return, line feed, and form feed.
+FORMAT_EFFECTOR
+  : [\t] 
+  ;
+
+fragment GRAPHIC_CHARACTER
+  : BASIC_GRAPHIC_CHARACTER
+  | LOWER_CASE_LETTER
+  | OTHER_SPECIAL_CHARACTER
+  ;
+
+IDENTIFIER
+  : [ BASIC_IDENTIFIER | EXTENDED_IDENTIFIER ]
+  ;
+
+fragment INTEGER
+  : DIGIT INTEGER_UNDERLINE_DIGIT*
+  ;
+
+fragment INTEGER_UNDERLINE_DIGIT //added for INTEGER
+  : UNDERLINE? DIGIT
+  ;
+
+LETTER
+  : UPPER_CASE_LETTER
+  | LOWER_CASE_LETTER
+  ;
+
+LETTER_OR_DIGIT
+  : LETTER
+  | DIGIT
+  ;
+
+STRING_LITERAL 
+  : DQUOTE GRAPHIC_CHARACTER* DQUOTE
+  ;
+
+
+//d) The space characters
+//SPACE1 NBSP 
+// Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage
+//return, line feed, and form feed.
+// The visual representation of the space is the absence of a graphic symbol. It may be interpreted as a graphic character, a control character, or both.
+// The visual representation of the nonbreaking space is the absence of a graphic symbol. It is used when a line break is to be prevented in the text as presented.
+
+//abcdefghijklmnopqrstuvwxyz§ˆ‡‰‹ŠŒ3⁄4••Ž•‘“’”•¶ – ̃—TM«›š¿•œžŸyp Ø
 
 WS : [ \t\r\n]+ -> skip ;
 
 // single characters delimiters:
 // & ' ( ) * + , - . / : ; < = > |[]
-CONCAT: '&';
-SQUOTE: '\'';
+//Special characters
+//" # & ' () * + , - . / : ; < = > [ ] _ |
+
+// TODO: needed for BASIC_GRAPHIC_CHARACTER
+//SPECIAL_CHARACTER
+//  : 
+//  ;
+
+AMPERSAND: '&'; // An ampersand (or epershand; "
+fragment FRAG_SQUOTE: '\'';
+SQUOTE: FRAG_SQUOTE;
+fragment DQUOTE: '"';
 LPAREN: '(';
 RPAREN: ')';
 STAR:   '*';
@@ -46,6 +178,9 @@ PIPE:   '|';
 LSB:    '['; //LSB for left square bracket. We an find a better name
 RSB:    ']'; //RSB for right square bracket. We an find a better name
 
+HASHSIGN: '#';
+BACKSLASH:'\\';
+
 // two chars delimiters:
 // => ** := /= >= <= <>
 ARROW:  '=>';
@@ -55,6 +190,11 @@ NEQ:    '/=';
 GTEQ:   '>=';
 LTEQ:   '<=';
 BOX:    '<>'; //box? diamond!
+
+fragment UNDERLINE: '_';
+
+
+// reserved keywords
 
 ABS: 'abs';
 ACCESS: 'access';
@@ -179,7 +319,7 @@ VHDL
 
 /* LRM IEEE Std 1076-1993 1.1 */
 entity_declaration
-  : ENTITY identifier IS
+  : ENTITY IDENTIFIER IS
       entity_header
       entity_declarative_part
     ( BEGIN entity_statement_part )?
@@ -248,7 +388,7 @@ entity_statement
 
 /* LRM IEEE Std 1076-1993 1.2 */
 architecture_body
-  : ARCHITECTURE identifier OF /*entity_*/name IS
+  : ARCHITECTURE IDENTIFIER OF /*entity_*/name IS
       architecture_declarative_part
     BEGIN
       architecture_statement_part
@@ -290,7 +430,7 @@ architecture_statement_part
 
 /* LRM IEEE Std 1076-1993 1.3 */
 configuration_declaration
-  : CONFIGURATION identifier OF /*entity_*/name IS
+  : CONFIGURATION IDENTIFIER OF /*entity_*/name IS
       configuration_declarative_part
       block_configuration
     END CONFIGURATION? /*configuration_*/simple_name? SEMICOLON
@@ -353,12 +493,12 @@ subprogram_specification
   ;
 
 designator
-  : identifier
+  : IDENTIFIER
   | operator_symbol
   ;
 
 operator_symbol
-  : string_literal
+  : STRING_LITERAL
   ;
 
 
@@ -415,7 +555,7 @@ signature
 
 /* LRM IEEE Std 1076-1993 2.5 */
 package_declaration
-  : PACKAGE identifier IS
+  : PACKAGE IDENTIFIER IS
       package_declarative_part
     END PACKAGE? /*package_*/simple_name? SEMICOLON
   ;
@@ -498,8 +638,8 @@ enumeration_type_definition
   ;
 
 enumeration_literal
-  : identifier
-  | character_literal
+  : IDENTIFIER
+  | CHARACTER_LITERAL
   ;
 
 
@@ -519,15 +659,15 @@ physical_type_definition
   ;
 
 base_unit_declaration
-  : identifier SEMICOLON // Weird: semicolon might be removed
+  : IDENTIFIER SEMICOLON // Weird: semicolon might be removed
   ;
 
 secondary_unit_declaration
-  : identifier EQ physical_literal SEMICOLON
+  : IDENTIFIER EQ physical_literal SEMICOLON
   ;
 
 physical_literal
-  : abstract_literal? /*unit_*/name
+  : ABSTRACT_LITERAL? /*unit_*/name
   ;
 
 
@@ -586,7 +726,7 @@ element_declaration
   ;
 
 identifier_list
-  : identifier ( COMMA identifier )*
+  : IDENTIFIER ( COMMA IDENTIFIER )*
   ;
 
 element_subtype_definition
@@ -602,7 +742,7 @@ access_type_definition
 
 /* LRM IEEE Std 1076-1993 3.3.1 */
 incomplete_type_declaration
-  : TYPE identifier SEMICOLON
+  : TYPE IDENTIFIER SEMICOLON
   ;
 
 
@@ -637,7 +777,7 @@ type_declaration
   ;
 
 full_type_declaration
-  : TYPE identifier IS type_definition SEMICOLON
+  : TYPE IDENTIFIER IS type_definition SEMICOLON
   ;
 
 type_definition
@@ -650,11 +790,11 @@ type_definition
 
 /* LRM IEEE Std 1076-1993 4.2 */
 subtype_declaration
-  : SUBTYPE identifier IS subtype_indication SEMICOLON
+  : SUBTYPE IDENTIFIER IS subtype_indication SEMICOLON
   ;
 
 subtype_indication
-  : */resolution_function_*/name? type_mark constraint?
+  : /*resolution_function_*/name? type_mark constraint?
   ;
 
 type_mark
@@ -721,25 +861,24 @@ interface_constant_declaration
   ;
 
 interface_signal_declaration
-  : SIGNAL? identifier_list COLON mode? subtype_indication BUS? ( VARASGN /*static_*/expression )?
+  : SIGNAL? identifier_list COLON modee? subtype_indication BUS? ( VARASGN /*static_*/expression )?
   ;
 
 interface_variable_declaration
-  : VARIABLE? identifier_list COLON mode? subtype_indication ( VARASGN /*static_*/expression )?
+  : VARIABLE? identifier_list COLON modee? subtype_indication ( VARASGN /*static_*/expression )?
   ;
 
 interface_file_declaration
   : FILE identifier_list COLON subtype_indication
   ;
 
-mode
+modee // mode caused antlrworks to misunderstand 
   : IN
   | OUT
   | INOUT
   | BUFFER
   | LINKAGE
   ;
-
 
 /* LRM IEEE Std 1076-1993 4.3.2.1 */
 interface_list
@@ -768,10 +907,8 @@ formal_part
 
 formal_designator
   : /*generic_*/name
-/*
-  | /*port_*/name
-  | /*parameter_*/name
-*/
+  //| /*port_*/name
+  //| /*parameter_*/name
   ;
 
 actual_part
@@ -783,10 +920,8 @@ actual_part
 actual_designator
   : expression
   | /*signal_*/name
-/*
-  | /*variable_*/name
-  | /*file_*/name
-*/
+//  | /*variable_*/name
+//  | /*file_*/name
   | OPEN
   ;
 
@@ -797,21 +932,21 @@ alias_declaration
   ;
 
 alias_designator
-  : identifier
-  | character_literal
+  : IDENTIFIER
+  | CHARACTER_LITERAL
   | operator_symbol
   ;
 
 
 /* LRM IEEE Std 1076-1993 4.4 */
 attribute_declaration
-  : ATTRIBUTE identifier COLON type_mark SEMICOLON
+  : ATTRIBUTE IDENTIFIER COLON type_mark SEMICOLON
   ;
 
 
 /* LRM IEEE Std 1076-1993 4.5 */
 component_declaration
-  : COMPONENT identifier IS?
+  : COMPONENT IDENTIFIER IS?
       /*local_*/generic_clause?
       /*local_*/port_clause?
     END COMPONENT /*component_*/simple_name? SEMICOLON
@@ -820,7 +955,7 @@ component_declaration
 
 /* LRM IEEE Std 1076-1993 4.6 */
 group_template_declaration
-  : GROUP identifier IS LPAREN entity_class_entry_list RPAREN SEMICOLON
+  : GROUP IDENTIFIER IS LPAREN entity_class_entry_list RPAREN SEMICOLON
   ;
 
 entity_class_entry_list
@@ -834,7 +969,7 @@ entity_class_entry
 
 /* LRM IEEE Std 1076-1993 4.7 */
 group_declaration
-  : GROUP identifier COLON /*group_template_*/name LPAREN group_constituent_list RPAREN SEMICOLON
+  : GROUP IDENTIFIER COLON /*group_template_*/name LPAREN group_constituent_list RPAREN SEMICOLON
   ;
 
 group_constituent_list
@@ -843,7 +978,7 @@ group_constituent_list
 
 group_constituent
   : name
-  | character_literal
+  | CHARACTER_LITERAL
   ;
 
 
@@ -888,7 +1023,7 @@ entity_designator
 
 entity_tag
   : simple_name
-  | character_literal
+  | CHARACTER_LITERAL
   | operator_symbol
   ;
 
@@ -917,7 +1052,7 @@ binding_indication
   ;
 
 entity_aspect
-  : ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  : ENTITY /*entity_*/name ( LPAREN /*architecture_*/IDENTIFIER RPAREN )?
   | CONFIGURATION /*configuration_*/name
   | OPEN
   ;
@@ -927,7 +1062,7 @@ generic_map_aspect
   ;
 
 port_map_aspect
-  : PORT MAP LPAREN port_association_list RPAREN
+  : PORT MAP LPAREN /*port_*/association_list RPAREN
   ;
 
 
@@ -965,7 +1100,7 @@ prefix
 
 /* LRM IEEE Std 1076-1993 6.2 */
 simple_name
-  : identifier
+  : IDENTIFIER
   ;
 
 
@@ -976,7 +1111,7 @@ selected_name
 
 suffix
   : simple_name
-  | character_literal
+  | CHARACTER_LITERAL
   | operator_symbol
   | ALL
   ;
@@ -1072,13 +1207,13 @@ shift_operator
 adding_operator
   : PLUS
   | MINUS
-  | CONCAT
+  | AMPERSAND
   ;
 
 sign
   : PLUS
   | MINUS
-
+  ;
 
 multiplying_operator
   : STAR
@@ -1094,13 +1229,13 @@ multiplying_operator
 literal
   : numeric_literal
   | enumeration_literal
-  | string_literal
-  | bit_string_literal
+  | STRING_LITERAL
+  | BIT_STRING_LITERAL
   | NULL
   ;
 
 numeric_literal
-  : abstract_literal
+  : ABSTRACT_LITERAL
   | physical_literal
   ;
 
@@ -1310,7 +1445,7 @@ iteration_scheme
   ;
 
 parameter_specification
-  : identifier IN discrete_range
+  : IDENTIFIER IN discrete_range
   ;
 
 
@@ -1429,24 +1564,23 @@ concurrent_signal_assignment_statement
   | ( label COLON )? POSTPONED? selected_signal_assignment
   ;
 
-options
+optionz //just as mode, it seems it gets angry with antlrworks2
   : GUARDED? delay_mechanism?
   ;
 
 
 /* LRM IEEE Std 1076-1993 9.5.1 */
 conditional_signal_assignment
-  : target LTEQ options conditional_waveforms SEMICOLON
+  : target LTEQ optionz conditional_waveforms SEMICOLON
   ;
 
 conditional_waveforms
   : ( waveform WHEN condition ELSE )* waveform ( WHEN condition )?
   ;
 
-
 /* LRM IEEE Std 1076-1993 9.5.2 */
 selected_signal_assignment
-  : WITH expression SELECT target LTEQ options selected_waveforms SEMICOLON
+  : WITH expression SELECT target LTEQ optionz selected_waveforms SEMICOLON
   ;
 
 selected_waveforms
@@ -1464,7 +1598,7 @@ component_instantiation_statement
 
 instantiated_unit
   : COMPONENT? /*component_*/name
-  | ENTITY /*entity_*/name ( LPAREN /*architecture_*/identifier RPAREN )?
+  | ENTITY /*entity_*/name ( LPAREN /*architecture_*/IDENTIFIER RPAREN )?
   | CONFIGURATION /*configuration_*/name
   ;
 
@@ -1484,7 +1618,7 @@ generation_scheme
   ;
 
 label
-  : identifier
+  : IDENTIFIER
   ;
 
 
@@ -1530,7 +1664,7 @@ logical_name_list
   ;
 
 logical_name
-  : identifier
+  : IDENTIFIER
   ;
 
 
@@ -1543,101 +1677,4 @@ context_item
   : library_clause
   | use_clause
   ;
-
-
-/* MISC RULES : probably lexer */
-
-
-abstract_literal
-  : decimal_literal
-  | based_literal
-  ;
-
-base
-  : integer
-  ;
-
-base_specifier
-  : 'B'
-  | 'O'
-  | 'X'
-  ;
-
-based_integer
-  : extended_digit ( underline? extended_digit )*
-  ;
-
-based_literal
-  : base # based_integer ( . based_integer )? # exponent?
-  ;
-
-basic_character
-  : basic_graphic_character | format_effector
-  ;
-
-basic_graphic_character
-  : upper_case_letter | digit | special_character| space_character
-;
-
-basic_identifier
-  : letter ( underline? letter_or_digit )*
-  ;
-
-bit_string_literal
-  : base_specifier " bit_value? "
-  ;
-
-bit_value
-  : extended_digit ( underline? extended_digit )*
-  ;
-
-character_literal
-  : ' graphic_character '
-  ;
-
-decimal_literal
-  : integer ( . integer )? exponent?
-  ;
-
-exponent
-  : E PLUS? integer
-  | E MINUS integer
-  ;
-
-extended_digit
-  : digit
-  | letter
-  ;
-
-extended_identifier
-  : \ graphic_character graphic_character* \
-  ;
-
-graphic_character
-  : basic_graphic_character
-  | lower_case_letter
-  | other_special_character
-  ;
-
-identifier
-  : basic_identifier
-  | extended_identifier
-  ;
-
-integer
-  : digit ( underline? digit )*
-  ;
-
-letter
-  : upper_case_letter
-  | lower_case_letter
-  ;
-
-letter_or_digit
-  : letter
-  | digit
-  ;
-
-string_literal : " graphic_character* "
-;
 
