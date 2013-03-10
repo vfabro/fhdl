@@ -8,9 +8,20 @@ ANTLRInputStream (InputStream input, String encoding) throws IOException
 
 TODO: the following set of rules are mutually left-recursive: name, prefix, function_call, selected_name, indexed_name, slice_name, attribute_name
 
+notes:
+  - ref0001 : search this line for refactoring of the left-recursive error
+
  */
 
 grammar fhdl;
+
+@headers{
+ package eu.mindspark.fhdl;
+}
+
+//WS : [ \t\r\n]+ -> skip ;
+NEWLINE:'\r'? '\n' -> skip ;     // return newlines to parser (is end-statement signal)
+WS  :   [ \t]+ -> skip ;         // toss out whitespace
 
 fragment UC_LETTER  : [a-z];
 fragment LC_LETTER  : [A-Z];
@@ -145,7 +156,6 @@ STRING_LITERAL
 
 //abcdefghijklmnopqrstuvwxyz§ˆ‡‰‹ŠŒ3⁄4••Ž•‘“’”•¶ – ̃—TM«›š¿•œžŸyp Ø
 
-WS : [ \t\r\n]+ -> skip ;
 
 // single characters delimiters:
 // & ' ( ) * + , - . / : ; < = > |[]
@@ -1084,16 +1094,17 @@ signal_list
 
 /* LRM IEEE Std 1076-1993 6.1 */
 name
-  : simple_name
-  | operator_symbol
-  | selected_name
-  | indexed_name
-  | slice_name
-  | attribute_name
+  : simple_name     // : IDENTIFIER ;
+  | operator_symbol // : STRING_LITERAL;
+  | selected_name   // : prefix DOT suffix
+  | indexed_name    // : prefix LPAREN expression ( COMMA expression )* RPAREN
+  | slice_name      // : prefix LPAREN discrete_range RPAREN
+  | attribute_name  // : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?
   ;
 
 prefix
-  : name
+  //: name // ref0001
+  : simple_name
   | function_call
   ;
 
@@ -1263,7 +1274,12 @@ choice
 
 /* LRM IEEE Std 1076-1993 7.3.3 */
 function_call
-  : /*function_*/name ( LPAREN actual_parameter_part RPAREN )?
+  //: /*function_*/name ( LPAREN actual_parameter_part RPAREN )? // ref0001
+  : function_name ( LPAREN actual_parameter_part RPAREN )?
+  ;
+
+function_name // ref0001
+  : simple_name
   ;
 
 actual_parameter_part
