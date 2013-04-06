@@ -4,5 +4,5 @@ alias grun='java org.antlr.v4.runtime.misc.TestRig'
 
 alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && javac src/eu/mindspark/fhdl/*.java'
 alias fhdlc='cd src; grun eu.mindspark.fhdl.fhdl design_file'
-alias fhdltest='fhdlc ../../../../test/testcases/fcall.vhd -trace'
+alias fhdltest='fhdlc ../test/testcases/fcall.vhd -trace'
 

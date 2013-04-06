@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<project name="KoRu" default="usage" basedir=".">
+	<property file="./build.properties" />
+	
+    <target name="usage">
+        <echo message=""/>
+        <echo message="FHDL build file"/>
+        <echo message="---------------"/>
+        <echo message=""/>
+        <echo message="Available targets are:"/>
+        <echo message=""/>
+        <echo message="clean   --> Delete previously generated grammar files (class, token, lexer, parser, g)"/>
+        <echo message="grammar --> Generate grammar source files, depends on clean"/>
+        <echo message="compile --> Compile grammar source files, depends on grammar and clean"/>
+        <echo message="run     --> run the interpreter, depends on compile, grammar and clean"/>
+        <echo message="rerun   --> run the interpreter without recompiling the whole project"/>
+        <echo message=""/>
+        <echo message="the basic interpreter gets the input until you finish it by pressing [newline][ctrl-z][enter] under windows or"/>
+        <echo message="by [newline][ctrl-d][enter] under Linux. Mac users anyone?"/>
+        <echo message=""/>
+    </target>
+
+<!--
+export CLASSPATH=".:`pwd`/lib/antlr/antlr-4.0-complete.jar:$CLASSPATH"
+alias antlr4='java -jar `pwd`/lib/antlr/antlr-4.0-complete.jar'
+alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && javac src/eu/mindspark/fhdl/*.java'
+
+alias grun='java org.antlr.v4.runtime.misc.TestRig'
+alias fhdlc='cd src; grun eu.mindspark.fhdl.fhdl design_file'
+alias fhdltest='fhdlc ../test/testcases/fcall.vhd -trace'
+-->
+
+	<target name="clean">
+		<echo message="clean generated grammar files and classes" />
+		<delete>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*.class"/>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*.tokens"/>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*__.g"/>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*Lexer.java"/>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*Parser.java"/>
+			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*Listener.java"/>
+		</delete>
+	</target>
+
+<!--
+alias antlr4='java -jar `pwd`/lib/antlr/antlr-4.0-complete.jar'
+alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && javac src/eu/mindspark/fhdl/*.java'
+-->
+
+	<target name="grammar" depends="clean">
+		<echo message="compile grammar file with antlr" />
+			<java classname="org.antlr.v4.Tool"> 
+				<classpath>
+					<pathelement path="${JARS}"/> 
+				</classpath>
+				<arg value="-o"/>
+				<arg value="${BUILDDIR}/eu/mindspark/fhdl/"/>
+				<arg value="-long-messages"/>
+				<arg value="-package"/>
+				<arg value="eu.mindspark.fhdl"/>
+				<arg value="${SRC}/eu/mindspark/fhdl/fhdl.g4"/>
+			</java>
+	</target>
+
+	<!--
+	<target name="tree1" depends="grammar">
+		<echo message="compile grammar file with antlr" />
+			<java classname="org.antlr.Tool"> 
+				<classpath>
+					<pathelement path="${JARS}/"/> 
+				</classpath>
+				<arg value="-fo"/>
+				<arg path="${SRC}/eu/mindspark/fhdl"/>
+				<arg value="treefhdlGenClasses.g"/>
+			</java>
+	</target>
+	-->
+	
+	<path id="com.mindspark.fhdl.runPath"> 
+		<pathelement path="${BUILDDIR}"/>
+		<pathelement path="${JARS}/"/> 
+	</path> 
+
+	<target name="compile" depends="grammar">
+		<echo message="compile fhdl interpreter" />
+		<javac 	classpath="${ANTLR_RUNTIME}" 
+				srcdir="${BUILDDIR}"
+				includes="eu/mindspark/*/**" />
+	</target>
+
+	<target name="runtokens" depends="compile">
+		<echo message="start fhdl main class" />
+			<java classname="org.antlr.v4.runtime.misc.TestRig"> 
+				<classpath>
+					<pathelement path="${BUILDDIR}"/>
+					<pathelement path="${JARS}/"/> 
+				</classpath>
+				<arg value="eu.mindspark.fhdl.fhdl"/>
+				<arg value="design_file"/>
+				<arg value="${TESTFILE}"/>
+				<arg value="-tokens"/>
+			</java>
+	</target>
+
+	<target name="runtrace" depends="compile">
+		<echo message="start fhdl main class" />
+			<java classname="org.antlr.v4.runtime.misc.TestRig"> 
+				<classpath>
+					<pathelement path="${BUILDDIR}"/>
+					<pathelement path="${JARS}/"/> 
+				</classpath>
+			</java>
+	</target>
+
+<!--	
+	<target name="run" depends="compile">
+		<echo message="start fhdl main class (this does not work with eclipse built-in console)" />
+			<java classname="com.mindspark.fhdl.fhdl"> 
+				<classpath>
+					<pathelement path="${SRC}"/>
+					<pathelement path="${JARS}/"/> 
+				</classpath>
+			</java>
+	</target>
+	-->
+		
+	<target name="dot" depends="compile">
+		<echo message="start fhdl main class interpreter and generate .dot files (this does not work with eclipse built-in console)" />
+			<java classname="fhdl"> 
+				<classpath refid="com.mindspark.fhdl.runPath" />
+				<arg value="-dot"/>
+			</java>
+	</target>
+	
+	<target name="gui" depends="compile">
+		<echo message="start fhdl main class interpreter and lanunches a gui file chooser (this does not work with eclipse built-in console)" />
+			<java classname="com.mindspark.fhdl.fhdl"> 
+				<classpath refid="eu..mindspark.fhdl.runPath" />
+				<arg value="--file-chooser"/>
+			</java>
+	</target>
+
+	<target name="file" depends="compile">
+		<echo message="start fhdl main class interpreter with defalt inpt file fhdl.fhdl (this SHOULD work with eclipse built-in console)" />
+			<java classname="eu.mindspark.fhdl.fhdl"> 
+				<classpath refid="eu.mindspark.fhdl.runPath" />
+				<arg value="--file"/>
+				<arg value="fhdl.fhdl"/>
+			</java>
+	</target>
+
+	<target name="rerun">
+		<echo message="start fhdl main class (this does not work with eclipse built-in console)" />
+			<java classname="eu.mindspark.fhdl.fhdl"> 
+				<classpath refid="eu.mindspark.fhdl.runPath" />
+			</java>
+	</target>
+	
+	<target name="test" depends="compile">
+		<java classname="org.antlr.gunit.Interp"> 
+			<classpath refid="eu.mindspark.fhdl.runPath" />
+			<arg path="test/fhdl.testsuite"/>
+		</java>
+	</target>
+
+	<target name="test-tree" depends="compile">
+		<java classname="org.antlr.gunit.Interp"> 
+			<classpath refid="eu.mindspark.fhdl.runPath" />
+			<arg path="test/fhdl_tree1.testsuite"/>
+		</java>
+	</target>
+	
+</project>

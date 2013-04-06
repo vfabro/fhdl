@@ -23,150 +23,6 @@ grammar fhdl;
 NEWLINE:'\r'? '\n' -> skip ;     // return newlines to parser (is end-statement signal)
 WS  :   [ \t]+ -> skip ;         // toss out whitespace
 
-fragment UC_LETTER  : [a-z];
-fragment LC_LETTER  : [A-Z];
-fragment DIGIT      : [0-9];
-
-UPPER_CASE_LETTER: UC_LETTER;
-LOWER_CASE_LETTER: LC_LETTER;
-
-//Other special characters ! $ % @ ? \ ^ ` { } ~ Á ¢ £ Û  ́ || ¤ ¬ © » Ç Â - ̈ ø ¡ ± 2 3 « μ ¦ ¥ ü 1 1⁄4 È 1/4 1/2 3/4 À  ́  ̧ - (soft hyphen)
-//TODO: other characters were not understood by antlrworks, so they are set 
-// aside on another text file waiting for their correct UTF-8 encoding 
-OTHER_SPECIAL_CHARACTER
-  : [!$%@?\^`{}~¢£́ ¤¬©»-̈ø¡±²³«μ¦¥ ü ́ ̧ -]
-  ;
-
-UPPERCASE_LETTER
-  : UC_LETTER //| [ËçåÌ€•®éƒæè] << utf8 '\u011'
-  //| 'í'|'ê'|'ë'|'ì'|'D'|„|'ñ'|'î'|'ï'|'Í'|'̄'|'ô'|'ò'|'ó'|†|'Y'
-  ;
-
-ABSTRACT_LITERAL //PO
-  : DECIMAL_LITERAL
-  | BASED_LITERAL
-  ;
-
-//base
-//  : INTEGER
-//  ; 
-
-fragment BASED_INTEGER // LO
-  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
-  ;
-
-fragment BASED_LITERAL //LO
-  : /*base*/ INTEGER HASHSIGN BASED_INTEGER ( . BASED_INTEGER )? HASHSIGN EXPONENT?
-  ;
-
-basic_character
-  : BASIC_GRAPHIC_CHARACTER | FORMAT_EFFECTOR
-  ;
-
-BASIC_GRAPHIC_CHARACTER
-  : UPPER_CASE_LETTER | DIGIT // | SPECIAL_CHARACTER 
-  ;
-
-fragment BASIC_IDENTIFIER
-  : LETTER ( UNDERLINE? LETTER_OR_DIGIT )*
-  ;
-
-BIT_STRING_LITERAL
-  : /*base_specifier*/ [BOX] DQUOTE BIT_VALUE? DQUOTE
-  ;
-
-/*base_specifier
-  : 'B'
-  | 'O'
-  | 'X'
-  ;*/
-
-fragment BIT_VALUE //LO
-  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
-  ;
-
-//PO
-CHARACTER_LITERAL
-  : FRAG_SQUOTE GRAPHIC_CHARACTER FRAG_SQUOTE
-  ;
-
-fragment DECIMAL_LITERAL //LO
-  : INTEGER ( DOT INTEGER )? EXPONENT?
-  ;
-
-fragment EXPONENT //LO
-  : 'E' PLUS? INTEGER
-  | 'E' MINUS INTEGER
-  ;
-
-fragment EXTENDED_DIGIT //LO
-  : DIGIT
-  | LETTER
-  ;
-
-fragment EXTENDED_IDENTIFIER
-  : BACKSLASH GRAPHIC_CHARACTER+ BACKSLASH
-  ;
-
-//TODO Tab is ASCII '\011'
-//TODO Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage return, line feed, and form feed.
-FORMAT_EFFECTOR
-  : [\t] 
-  ;
-
-fragment GRAPHIC_CHARACTER
-  : BASIC_GRAPHIC_CHARACTER
-  | LOWER_CASE_LETTER
-  | OTHER_SPECIAL_CHARACTER
-  ;
-
-IDENTIFIER
-  : [ BASIC_IDENTIFIER | EXTENDED_IDENTIFIER ]
-  ;
-
-fragment INTEGER
-  : DIGIT INTEGER_UNDERLINE_DIGIT*
-  ;
-
-fragment INTEGER_UNDERLINE_DIGIT //added for INTEGER
-  : UNDERLINE? DIGIT
-  ;
-
-LETTER
-  : UPPER_CASE_LETTER
-  | LOWER_CASE_LETTER
-  ;
-
-LETTER_OR_DIGIT
-  : LETTER
-  | DIGIT
-  ;
-
-STRING_LITERAL 
-  : DQUOTE GRAPHIC_CHARACTER* DQUOTE
-  ;
-
-
-//d) The space characters
-//SPACE1 NBSP 
-// Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage
-//return, line feed, and form feed.
-// The visual representation of the space is the absence of a graphic symbol. It may be interpreted as a graphic character, a control character, or both.
-// The visual representation of the nonbreaking space is the absence of a graphic symbol. It is used when a line break is to be prevented in the text as presented.
-
-//abcdefghijklmnopqrstuvwxyz§ˆ‡‰‹ŠŒ3⁄4••Ž•‘“’”•¶ – ̃—TM«›š¿•œžŸyp Ø
-
-
-// single characters delimiters:
-// & ' ( ) * + , - . / : ; < = > |[]
-//Special characters
-//" # & ' () * + , - . / : ; < = > [ ] _ |
-
-// TODO: needed for BASIC_GRAPHIC_CHARACTER
-//SPECIAL_CHARACTER
-//  : 
-//  ;
-
 AMPERSAND: '&'; // An ampersand (or epershand; "
 fragment FRAG_SQUOTE: '\'';
 SQUOTE: FRAG_SQUOTE;
@@ -303,6 +159,154 @@ WHILE: 'while';
 WITH: 'with';
 XNOR: 'xnor';
 XOR: 'xor';
+
+
+fragment LC_LETTER  : [a-z];
+fragment UC_LETTER  : [A-Z];
+fragment DIGIT      : [0-9];
+
+fragment UPPER_CASE_LETTER: UC_LETTER;
+fragment LOWER_CASE_LETTER: LC_LETTER;
+
+//Other special characters ! $ % @ ? \ ^ ` { } ~ Á ¢ £ Û  ́ || ¤ ¬ © » Ç Â - ̈ ø ¡ ± 2 3 « μ ¦ ¥ ü 1 1⁄4 È 1/4 1/2 3/4 À  ́  ̧ - (soft hyphen)
+//TODO: other characters were not understood by antlrworks, so they are set 
+// aside on another text file waiting for their correct UTF-8 encoding 
+OTHER_SPECIAL_CHARACTER
+  : [!$%@?\^`{}~¢£́ ¤¬©»-̈ø¡±²³«μ¦¥ ü ́ ̧ -]
+  ;
+
+UPPERCASE_LETTER
+  : UC_LETTER //| [ËçåÌ€•®éƒæè] << utf8 '\u011'
+  //| 'í'|'ê'|'ë'|'ì'|'D'|„|'ñ'|'î'|'ï'|'Í'|'̄'|'ô'|'ò'|'ó'|†|'Y'
+  ;
+
+ABSTRACT_LITERAL //PO
+  : DECIMAL_LITERAL
+  | BASED_LITERAL
+  ;
+
+//base
+//  : INTEGER
+//  ; 
+
+fragment BASED_INTEGER // LO
+  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
+  ;
+
+fragment BASED_LITERAL //LO
+  : /*base*/ INTEGER HASHSIGN BASED_INTEGER ( . BASED_INTEGER )? HASHSIGN EXPONENT?
+  ;
+
+fragment BASIC_GRAPHIC_CHARACTER
+  : UPPER_CASE_LETTER 
+  | DIGIT 
+  // | SPECIAL_CHARACTER 
+  ;
+
+//TODO Tab is ASCII '\011'
+//TODO Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage return, line feed, and form feed.
+fragment FORMAT_EFFECTOR
+  : [\t] 
+  ;
+
+//basic_character
+//  : BASIC_GRAPHIC_CHARACTER | FORMAT_EFFECTOR
+//  ;
+
+fragment BASIC_IDENTIFIER
+  : LETTER ( UNDERLINE? LETTER_OR_DIGIT )*
+  ;
+
+BIT_STRING_LITERAL
+  : /*base_specifier*/ [BOX] DQUOTE BIT_VALUE? DQUOTE
+  ;
+
+/*base_specifier
+  : 'B'
+  | 'O'
+  | 'X'
+  ;*/
+
+fragment BIT_VALUE //LO
+  : EXTENDED_DIGIT ( UNDERLINE? EXTENDED_DIGIT )*
+  ;
+
+//PO
+CHARACTER_LITERAL
+  : FRAG_SQUOTE GRAPHIC_CHARACTER FRAG_SQUOTE
+  ;
+
+fragment DECIMAL_LITERAL //LO
+  : INTEGER ( DOT INTEGER )? EXPONENT?
+  ;
+
+fragment EXPONENT //LO
+  : 'E' PLUS? INTEGER
+  | 'E' MINUS INTEGER
+  ;
+
+fragment EXTENDED_DIGIT //LO
+  : DIGIT
+  | LETTER
+  ;
+
+fragment EXTENDED_IDENTIFIER
+  : BACKSLASH GRAPHIC_CHARACTER+ BACKSLASH
+  ;
+
+fragment GRAPHIC_CHARACTER
+  : BASIC_GRAPHIC_CHARACTER
+  | LOWER_CASE_LETTER
+  | OTHER_SPECIAL_CHARACTER
+  ;
+
+IDENTIFIER
+  : ( BASIC_IDENTIFIER |�EXTENDED_IDENTIFIER )+
+  ;
+
+fragment INTEGER
+  : DIGIT INTEGER_UNDERLINE_DIGIT*
+  ;
+
+fragment INTEGER_UNDERLINE_DIGIT //added for INTEGER
+  : UNDERLINE? DIGIT
+  ;
+
+LETTER
+  : UPPER_CASE_LETTER
+  | LOWER_CASE_LETTER
+  ;
+
+LETTER_OR_DIGIT
+  : LETTER
+  | DIGIT
+  ;
+
+STRING_LITERAL 
+  : DQUOTE GRAPHIC_CHARACTER* DQUOTE
+  ;
+
+
+//d) The space characters
+//SPACE1 NBSP 
+// Format effectors are the ISO (and ASCII) characters called horizontal tabulation, vertical tabulation, carriage
+//return, line feed, and form feed.
+// The visual representation of the space is the absence of a graphic symbol. It may be interpreted as a graphic character, a control character, or both.
+// The visual representation of the nonbreaking space is the absence of a graphic symbol. It is used when a line break is to be prevented in the text as presented.
+
+//abcdefghijklmnopqrstuvwxyz§ˆ‡‰‹ŠŒ3⁄4••Ž•‘“’”•¶ – ̃—TM«›š¿•œžŸyp Ø
+
+
+// single characters delimiters:
+// & ' ( ) * + , - . / : ; < = > |[]
+//Special characters
+//" # & ' () * + , - . / : ; < = > [ ] _ |
+
+// TODO: needed for BASIC_GRAPHIC_CHARACTER
+//SPECIAL_CHARACTER
+//  : 
+//  ;
+
 
 /*
 p174 -> keywords as names !!! twisted to implement
