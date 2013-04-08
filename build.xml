@@ -99,6 +99,7 @@ alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && 
 				<arg value="design_file"/>
 				<arg value="${TESTFILE}"/>
 				<arg value="-tokens"/>
+				<arg value="-trace"/>
 			</java>
 	</target>
 
