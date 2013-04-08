@@ -1188,7 +1188,7 @@ factor
 
 primary
   : name
-  | LITERAL
+  | literal
   | aggregate
   | function_call
   | qualified_expression
