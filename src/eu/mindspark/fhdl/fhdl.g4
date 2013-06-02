@@ -1095,13 +1095,14 @@ signal_list
 
 /* LRM IEEE Std 1076-1993 6.1 */
 name
-  : simple_name
-  | operator_symbol
-  | selected_name
-  | indexed_name
-  | slice_name
-  | attribute_name
+  : simple_name     // : IDENTIFIER ;
+  | operator_symbol // : STRING_LITERAL;
+  | selected_name   // : prefix DOT suffix   
+  | indexed_name    // : prefix LPAREN expression ( COMMA expression )* RPAREN
+  | slice_name      // : prefix LPAREN discrete_range RPAREN
+  | attribute_name  // : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )? 
   ;
+
 
 prefix
   : name
