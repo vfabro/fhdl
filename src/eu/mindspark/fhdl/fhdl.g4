@@ -8,9 +8,6 @@ ANTLRInputStream (InputStream input, String encoding) throws IOException
 
 TODO: the following set of rules are mutually left-recursive: name, prefix, function_call, selected_name, indexed_name, slice_name, attribute_name
 
-notes:
-  - ref0001 : search this line for refactoring of the left-recursive error
-
  */
 
 grammar fhdl;
@@ -261,7 +258,7 @@ fragment GRAPHIC_CHARACTER
   ;
 
 IDENTIFIER
-  : ( BASIC_IDENTIFIER |ÊEXTENDED_IDENTIFIER )+
+  : ( BASIC_IDENTIFIER | EXTENDED_IDENTIFIER )+
   ;
 
 fragment INTEGER
@@ -1098,17 +1095,16 @@ signal_list
 
 /* LRM IEEE Std 1076-1993 6.1 */
 name
-  : simple_name     // : IDENTIFIER ;
-  | operator_symbol // : STRING_LITERAL;
-  | selected_name   // : prefix DOT suffix
-  | indexed_name    // : prefix LPAREN expression ( COMMA expression )* RPAREN
-  | slice_name      // : prefix LPAREN discrete_range RPAREN
-  | attribute_name  // : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?
+  : simple_name
+  | operator_symbol
+  | selected_name
+  | indexed_name
+  | slice_name
+  | attribute_name
   ;
 
 prefix
-  //: name // ref0001
-  : simple_name
+  : name
   | function_call
   ;
 
@@ -1278,12 +1274,7 @@ choice
 
 /* LRM IEEE Std 1076-1993 7.3.3 */
 function_call
-  //: /*function_*/name ( LPAREN actual_parameter_part RPAREN )? // ref0001
-  : function_name ( LPAREN actual_parameter_part RPAREN )?
-  ;
-
-function_name // ref0001
-  : simple_name
+  : /*function_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
 
 actual_parameter_part

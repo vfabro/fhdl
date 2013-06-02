@@ -32,6 +32,7 @@ alias fhdltest='fhdlc ../test/testcases/fcall.vhd -trace'
 
 	<target name="clean">
 		<echo message="clean generated grammar files and classes" />
+    <mkdir dir="${BUILDDIR}/eu/mindspark/fhdl"/>
 		<delete>
 			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*.class"/>
 			<fileset dir="${BUILDDIR}/eu/mindspark/fhdl" includes="*.tokens"/>
