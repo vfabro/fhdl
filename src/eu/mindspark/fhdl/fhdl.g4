@@ -1095,28 +1095,29 @@ signal_list
 
 /* LRM IEEE Std 1076-1993 6.1 */
 name
-  : simple_name     // : IDENTIFIER ;
-  | operator_symbol // : STRING_LITERAL;
-  | selected_name   // : prefix DOT suffix   
-  | indexed_name    // : prefix LPAREN expression ( COMMA expression )* RPAREN
-  | slice_name      // : prefix LPAREN discrete_range RPAREN
-  | attribute_name  // : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )? 
+  : simple_name
+  | operator_symbol
+  | name (LPAREN actual_parameter_part RPAREN )?            // name or function_call (prefix)
+        ( DOT suffix                                        // selected_name
+        | LPAREN expression ( COMMA expression )* RPAREN    // indexed_name
+        | LPAREN discrete_range RPAREN                      // slice_name
+        | ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?  // attribute_name
+        )
   ;
 
-
+/* inlined into selected_name, indexed_name, slice_name, attribute_name */
 prefix
   : name
   | function_call
   ;
-
 
 /* LRM IEEE Std 1076-1993 6.2 */
 simple_name
   : IDENTIFIER
   ;
 
-
 /* LRM IEEE Std 1076-1993 6.3 */
+/* inlined into name */
 selected_name
   : prefix DOT suffix
   ;
@@ -1128,20 +1129,20 @@ suffix
   | ALL
   ;
 
-
 /* LRM IEEE Std 1076-1993 6.4 */
-indexed_name
-  : prefix LPAREN expression ( COMMA expression )* RPAREN
-  ;
-
+/* inlined into name */
+//indexed_name
+//  : prefix LPAREN expression ( COMMA expression )* RPAREN
+//  ;
 
 /* LRM IEEE Std 1076-1993 6.5 */
-slice_name
-  : prefix LPAREN discrete_range RPAREN
-  ;
-
+/* inlined into name */
+//slice_name
+//  : prefix LPAREN discrete_range RPAREN
+//  ;
 
 /* LRM IEEE Std 1076-1993 6.6 */
+/* inlined into name */
 attribute_name
   : prefix ( signature )? SQUOTE attribute_designator ( LPAREN expression RPAREN )?
   ;
@@ -1272,8 +1273,8 @@ choice
   | OTHERS
   ;
 
-
 /* LRM IEEE Std 1076-1993 7.3.3 */
+/* inlined into rule "name" */
 function_call
   : /*function_*/name ( LPAREN actual_parameter_part RPAREN )?
   ;
