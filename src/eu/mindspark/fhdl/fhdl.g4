@@ -1165,6 +1165,7 @@ attribute_name
 
 attribute_designator
   : /*attribute_*/simple_name
+  | RANGE_KW /* Covers the 'range case, range is a keyword and could be potentially an identifier */ 
   ;
 
 
