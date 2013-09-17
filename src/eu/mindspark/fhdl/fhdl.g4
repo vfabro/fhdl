@@ -228,7 +228,7 @@ fragment BASIC_IDENTIFIER
   ;
 
 BIT_STRING_LITERAL
-  : /*base_specifier*/ [BOX] DQUOTE BIT_VALUE? DQUOTE
+  : /*base_specifier*/ [BOXbox] DQUOTE BIT_VALUE? DQUOTE
   ;
 
 /*base_specifier
