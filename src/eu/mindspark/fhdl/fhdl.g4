@@ -71,6 +71,38 @@ BOX:    '<>'; //box? diamond!
 
 fragment UNDERLINE: '_';
 
+// Operators Symbols
+OPERATOR_SYMBOL
+  : DQUOTE [aA][nN][dD] DQUOTE
+  | DQUOTE [oO][rR] DQUOTE
+  | DQUOTE [nN][aA][nN][dD] DQUOTE
+  | DQUOTE [nN][oO][rR] DQUOTE
+  | DQUOTE [xX][oO][rR] DQUOTE
+  | DQUOTE [xX][nN][oO][rR] DQUOTE
+  | DQUOTE '=' DQUOTE
+  | DQUOTE '/=' DQUOTE
+  | DQUOTE '<' DQUOTE
+  | DQUOTE '<=' DQUOTE
+  | DQUOTE '>' DQUOTE
+  | DQUOTE '>=' DQUOTE
+  | DQUOTE [sS][lL][lL] DQUOTE
+  | DQUOTE [sS][rR][lL] DQUOTE
+  | DQUOTE [sS][lL][aA] DQUOTE
+  | DQUOTE [sS][rR][aA] DQUOTE
+  | DQUOTE [rR][oO][lL] DQUOTE
+  | DQUOTE [rR][oO][rR] DQUOTE
+  | DQUOTE '+' DQUOTE
+  | DQUOTE '-' DQUOTE
+  | DQUOTE '&' DQUOTE
+  | DQUOTE '*' DQUOTE
+  | DQUOTE '/' DQUOTE
+  | DQUOTE [mM][oO][dD] DQUOTE
+  | DQUOTE [rR][eE][mM] DQUOTE
+  | DQUOTE '**' DQUOTE
+  | DQUOTE [aA][bB][sS] DQUOTE
+  | DQUOTE [nN][oO][tT] DQUOTE
+//  | STRING_LITERAL
+  ;
 
 // reserved keywords
 
@@ -520,13 +552,8 @@ subprogram_specification
 
 designator
   : IDENTIFIER
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
-
-operator_symbol
-  : STRING_LITERAL
-  ;
-
 
 /* LRM IEEE Std 1076-1993 2.1.1 */
 formal_parameter_list
@@ -960,7 +987,7 @@ alias_declaration
 alias_designator
   : IDENTIFIER
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
 
 
@@ -1050,7 +1077,7 @@ entity_designator
 entity_tag
   : simple_name
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
 
 
@@ -1111,7 +1138,7 @@ signal_list
 /* LRM IEEE Std 1076-1993 6.1 */
 name
   : simple_name
-  | operator_symbol
+  | OPERATOR_SYMBOL
   | name (LPAREN actual_parameter_part RPAREN )?            // name or function_call (prefix)
         ( DOT suffix                                        // selected_name
         | LPAREN expression ( COMMA expression )* RPAREN    // indexed_name
@@ -1140,7 +1167,7 @@ selected_name
 suffix
   : simple_name
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   | ALL
   ;
 
