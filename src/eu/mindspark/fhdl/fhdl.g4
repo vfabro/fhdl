@@ -29,6 +29,8 @@ grammar fhdl;
  package eu.mindspark.fhdl;
 }
 
+COMMENT: ('--' (~[\r\n])*? '\r'? '\n') -> skip;
+
 //WS : [ \t\r\n]+ -> skip ;
 NEWLINE:'\r'? '\n' -> skip ;     // return newlines to parser (is end-statement signal)
 WS  :   [ \t]+ -> skip ;         // toss out whitespace
