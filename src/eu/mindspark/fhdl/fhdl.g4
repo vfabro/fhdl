@@ -21,9 +21,6 @@ For special unicode caracters:
 In ANTLR 3, you can use the ANTLRInputStream constructor that takes an ancoding as a parameter:
 ANTLRInputStream (InputStream input, String encoding) throws IOException
 
-
-TODO: the following set of rules are mutually left-recursive: name, prefix, function_call, selected_name, indexed_name, slice_name, attribute_name
-
  */
 
 grammar fhdl;
@@ -1135,7 +1132,7 @@ simple_name
 /* LRM IEEE Std 1076-1993 6.3 */
 /* inlined into name */
 selected_name
-  : prefix DOT suffix
+  : simple_name (DOT suffix)*
   ;
 
 suffix
