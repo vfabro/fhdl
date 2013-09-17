@@ -323,7 +323,7 @@ LETTER_OR_DIGIT
   ;
 
 STRING_LITERAL 
-  : DQUOTE (~["])* DQUOTE
+  : DQUOTE ( ~["] | '""' )* DQUOTE
   ;
 
 
