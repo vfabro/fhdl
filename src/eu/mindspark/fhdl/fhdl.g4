@@ -219,11 +219,6 @@ OTHER_SPECIAL_CHARACTER
   : [!$%@?\^`{}~¢£́ ¤¬©»-̈ø¡±²³«μ¦¥ ü ́ ̧ -]
   ;
 
-UPPERCASE_LETTER
-  : UC_LETTER //| [ËçåÌ€•®éƒæè] << utf8 '\u011'
-  //| 'í'|'ê'|'ë'|'ì'|'D'|„|'ñ'|'î'|'ï'|'Í'|'̄'|'ô'|'ò'|'ó'|†|'Y'
-  ;
-
 ABSTRACT_LITERAL //PO
   : DECIMAL_LITERAL
   | BASED_LITERAL
