@@ -21,9 +21,6 @@ For special unicode caracters:
 In ANTLR 3, you can use the ANTLRInputStream constructor that takes an ancoding as a parameter:
 ANTLRInputStream (InputStream input, String encoding) throws IOException
 
-
-TODO: the following set of rules are mutually left-recursive: name, prefix, function_call, selected_name, indexed_name, slice_name, attribute_name
-
  */
 
 grammar fhdl;
@@ -31,6 +28,8 @@ grammar fhdl;
 @headers{
  package eu.mindspark.fhdl;
 }
+
+COMMENT: ('--' (~[\r\n])*? '\r'? '\n') -> skip;
 
 //WS : [ \t\r\n]+ -> skip ;
 NEWLINE:'\r'? '\n' -> skip ;     // return newlines to parser (is end-statement signal)
@@ -72,106 +71,138 @@ BOX:    '<>'; //box? diamond!
 
 fragment UNDERLINE: '_';
 
+// Operators Symbols
+OPERATOR_SYMBOL
+  : DQUOTE [aA][nN][dD] DQUOTE
+  | DQUOTE [oO][rR] DQUOTE
+  | DQUOTE [nN][aA][nN][dD] DQUOTE
+  | DQUOTE [nN][oO][rR] DQUOTE
+  | DQUOTE [xX][oO][rR] DQUOTE
+  | DQUOTE [xX][nN][oO][rR] DQUOTE
+  | DQUOTE '=' DQUOTE
+  | DQUOTE '/=' DQUOTE
+  | DQUOTE '<' DQUOTE
+  | DQUOTE '<=' DQUOTE
+  | DQUOTE '>' DQUOTE
+  | DQUOTE '>=' DQUOTE
+  | DQUOTE [sS][lL][lL] DQUOTE
+  | DQUOTE [sS][rR][lL] DQUOTE
+  | DQUOTE [sS][lL][aA] DQUOTE
+  | DQUOTE [sS][rR][aA] DQUOTE
+  | DQUOTE [rR][oO][lL] DQUOTE
+  | DQUOTE [rR][oO][rR] DQUOTE
+  | DQUOTE '+' DQUOTE
+  | DQUOTE '-' DQUOTE
+  | DQUOTE '&' DQUOTE
+  | DQUOTE '*' DQUOTE
+  | DQUOTE '/' DQUOTE
+  | DQUOTE [mM][oO][dD] DQUOTE
+  | DQUOTE [rR][eE][mM] DQUOTE
+  | DQUOTE '**' DQUOTE
+  | DQUOTE [aA][bB][sS] DQUOTE
+  | DQUOTE [nN][oO][tT] DQUOTE
+//  | STRING_LITERAL
+  ;
 
 // reserved keywords
 
-ABS: 'abs';
-ACCESS: 'access';
-AFTER: 'after';
-ALIAS: 'alias';
-ALL: 'all';
-AND: 'and';
-ARCHITECTURE: 'architecture';
-ARRAY: 'array';
-ASSERT: 'assert';
-ATTRIBUTE: 'attribute';
-BEGIN: 'begin';
-BLOCK: 'block';
-BODY: 'body';
-BUFFER: 'buffer';
-BUS: 'bus';
-CASE: 'case';
-COMPONENT: 'component';
-CONFIGURATION: 'configuration';
-CONSTANT: 'constant';
-DISCONNECT: 'disconnect';
-DOWNTO: 'downto';
-ELSE: 'else';
-ELSIF: 'elsif';
-END: 'end';
-ENTITY: 'entity';
-EXIT: 'exit';
-FILE: 'file';
-FOR: 'for';
-FUNCTION: 'function';
-GENERATE: 'generate';
-GENERIC: 'generic';
-GROUP: 'group';
-GUARDED: 'guarded';
-IF: 'if';
-IMPURE: 'impure';
-IN: 'in';
-INERTIAL: 'inertial';
-INOUT: 'inout';
-IS: 'is';
-LABEL_KW: 'label';
-LIBRARY: 'library';
-LINKAGE: 'linkage';
-LITERAL: 'literal';
-LOOP: 'loop';
-MAP: 'map';
-MOD: 'mod';
-NAND: 'nand';
-NEW: 'new';
-NEXT: 'next';
-NOR: 'nor';
-NOT: 'not';
-NULL: 'null';
-OF: 'of';
-ON: 'on';
-OPEN: 'open';
-OR: 'or';
-OTHERS: 'others';
-OUT: 'out';
-PACKAGE: 'package';
-PORT: 'port';
-POSTPONED: 'postponed';
-PROCEDURE: 'procedure';
-PROCESS: 'process';
-PURE: 'pure';
-RANGE_KW: 'range';
-RECORD: 'record';
-REGISTER: 'register';
-REJECT: 'reject';
-REM: 'rem';
-REPORT: 'report';
-RETURN: 'return';
-ROL: 'rol';
-ROR: 'ror';
-SELECT: 'select';
-SEVERITY: 'severity';
-SHARED: 'shared';
-SIGNAL: 'signal';
-SLA: 'sla';
-SLL: 'sll';
-SRA: 'sra';
-SRL: 'srl';
-SUBTYPE: 'subtype';
-THEN: 'then';
-TO: 'to';
-TRANSPORT: 'transport';
-TYPE: 'type';
-UNAFFECTED: 'unaffected';
-UNITS: 'units';
-UNTIL: 'until';
-USE: 'use';
-VARIABLE: 'variable';
-WAIT: 'wait';
-WHEN: 'when';
-WHILE: 'while';
-WITH: 'with';
-XNOR: 'xnor';
-XOR: 'xor';
+ABS: [aA][bB][sS];
+ACCESS: [aA][cC][cC][eE][sS][sS];
+AFTER: [aA][fF][tT][eE][rR];
+ALIAS: [aA][lL][iI][aA][sS];
+ALL: [aA][lL][lL];
+AND: [aA][nN][dD];
+ARCHITECTURE: [aA][rR][cC][hH][iI][tT][eE][cC][tT][uU][rR][eE];
+ARRAY: [aA][rR][rR][aA][yY];
+ASSERT: [aA][sS][sS][eE][rR][tT];
+ATTRIBUTE: [aA][tT][tT][rR][iI][bB][uU][tT][eE];
+BEGIN: [bB][eE][gG][iI][nN];
+BLOCK: [bB][lL][oO][cC][kK];
+BODY: [bB][oO][dD][yY];
+BUFFER: [bB][uU][fF][fF][eE][rR];
+BUS: [bB][uU][sS];
+CASE: [cC][aA][sS][eE];
+COMPONENT: [cC][oO][mM][pP][oO][nN][eE][nN][tT];
+CONFIGURATION: [cC][oO][nN][fF][iI][gG][uU][rR][aA][tT][iI][oO][nN];
+CONSTANT: [cC][oO][nN][sS][tT][aA][nN][tT];
+DISCONNECT: [dD][iI][sS][cC][oO][nN][nN][eE][cC][tT];
+DOWNTO: [dD][oO][wW][nN][tT][oO];
+ELSE: [eE][lL][sS][eE];
+ELSIF: [eE][lL][sS][iI][fF];
+END: [eE][nN][dD];
+ENTITY: [eE][nN][tT][iI][tT][yY];
+EXIT: [eE][xX][iI][tT];
+FILE: [fF][iI][lL][eE];
+FOR: [fF][oO][rR];
+FUNCTION: [fF][uU][nN][cC][tT][iI][oO][nN];
+GENERATE: [gG][eE][nN][eE][rR][aA][tT][eE];
+GENERIC: [gG][eE][nN][eE][rR][iI][cC];
+GROUP: [gG][rR][oO][uU][pP];
+GUARDED: [gG][uU][aA][rR][dD][eE][dD];
+IF: [iI][fF];
+IMPURE: [iI][mM][pP][uU][rR][eE];
+IN: [iI][nN];
+INERTIAL: [iI][nN][eE][rR][tT][iI][aA][lL];
+INOUT: [iI][nN][oO][uU][tT];
+IS: [iI][sS];
+LABEL_KW: [lL][aA][bB][eE][lL];
+LIBRARY: [lL][iI][bB][rR][aA][rR][yY];
+LINKAGE: [lL][iI][nN][kK][aA][gG][eE];
+LITERAL: [lL][iI][tT][eE][rR][aA][lL];
+LOOP: [lL][oO][oO][pP];
+MAP: [mM][aA][pP];
+MOD: [mM][oO][dD];
+NAND: [nN][aA][nN][dD];
+NEW: [nN][eE][wW];
+NEXT: [nN][eE][xX][tT];
+NOR: [nN][oO][rR];
+NOT: [nN][oO][tT];
+NULL: [nN][uU][lL][lL];
+OF: [oO][fF];
+ON: [oO][nN];
+OPEN: [oO][pP][eE][nN];
+OR: [oO][rR];
+OTHERS: [oO][tT][hH][eE][rR][sS];
+OUT: [oO][uU][tT];
+PACKAGE: [pP][aA][cC][kK][aA][gG][eE];
+PORT: [pP][oO][rR][tT];
+POSTPONED: [pP][oO][sS][tT][pP][oO][nN][eE][dD];
+PROCEDURE: [pP][rR][oO][cC][eE][dD][uU][rR][eE];
+PROCESS: [pP][rR][oO][cC][eE][sS][sS];
+PURE: [pP][uU][rR][eE];
+RANGE_KW: [rR][aA][nN][gG][eE];
+RECORD: [rR][eE][cC][oO][rR][dD];
+REGISTER: [rR][eE][gG][iI][sS][tT][eE][rR];
+REJECT: [rR][eE][jJ][eE][cC][tT];
+REM: [rR][eE][mM];
+REPORT: [rR][eE][pP][oO][rR][tT];
+RETURN: [rR][eE][tT][uU][rR][nN];
+ROL: [rR][oO][lL];
+ROR: [rR][oO][rR];
+SELECT: [sS][eE][lL][eE][cC][tT];
+SEVERITY: [sS][eE][vV][eE][rR][iI][tT][yY];
+SHARED: [sS][hH][aA][rR][eE][dD];
+SIGNAL: [sS][iI][gG][nN][aA][lL];
+SLA: [sS][lL][aA];
+SLL: [sS][lL][lL];
+SRA: [sS][rR][aA];
+SRL: [sS][rR][lL];
+SUBTYPE: [sS][uU][bB][tT][yY][pP][eE];
+THEN: [tT][hH][eE][nN];
+TO: [tT][oO];
+TRANSPORT: [tT][rR][aA][nN][sS][pP][oO][rR][tT];
+TYPE: [tT][yY][pP][eE];
+UNAFFECTED: [uU][nN][aA][fF][fF][eE][cC][tT][eE][dD];
+UNITS: [uU][nN][iI][tT][sS];
+UNTIL: [uU][nN][tT][iI][lL];
+USE: [uU][sS][eE];
+VARIABLE: [vV][aA][rR][iI][aA][bB][lL][eE];
+WAIT: [wW][aA][iI][tT];
+WHEN: [wW][hH][eE][nN];
+WHILE: [wW][hH][iI][lL][eE];
+WITH: [wW][iI][tT][hH];
+XNOR: [xX][nN][oO][rR];
+XOR: [xX][oO][rR];
 
 
 fragment LC_LETTER  : [a-z];
@@ -186,11 +217,6 @@ fragment LOWER_CASE_LETTER: LC_LETTER;
 // aside on another text file waiting for their correct UTF-8 encoding 
 OTHER_SPECIAL_CHARACTER
   : [!$%@?\^`{}~¢£́ ¤¬©»-̈ø¡±²³«μ¦¥ ü ́ ̧ -]
-  ;
-
-UPPERCASE_LETTER
-  : UC_LETTER //| [ËçåÌ€•®éƒæè] << utf8 '\u011'
-  //| 'í'|'ê'|'ë'|'ì'|'D'|„|'ñ'|'î'|'ï'|'Í'|'̄'|'ô'|'ò'|'ó'|†|'Y'
   ;
 
 ABSTRACT_LITERAL //PO
@@ -231,7 +257,7 @@ fragment BASIC_IDENTIFIER
   ;
 
 BIT_STRING_LITERAL
-  : /*base_specifier*/ [BOX] DQUOTE BIT_VALUE? DQUOTE
+  : /*base_specifier*/ [BOXbox] DQUOTE BIT_VALUE? DQUOTE
   ;
 
 /*base_specifier
@@ -274,7 +300,8 @@ fragment GRAPHIC_CHARACTER
   ;
 
 IDENTIFIER
-  : ( BASIC_IDENTIFIER | EXTENDED_IDENTIFIER )+
+  : BASIC_IDENTIFIER
+  | EXTENDED_IDENTIFIER
   ;
 
 fragment INTEGER
@@ -296,7 +323,7 @@ LETTER_OR_DIGIT
   ;
 
 STRING_LITERAL 
-  : DQUOTE GRAPHIC_CHARACTER* DQUOTE
+  : DQUOTE ( ~["] | '""' )* DQUOTE
   ;
 
 
@@ -521,13 +548,8 @@ subprogram_specification
 
 designator
   : IDENTIFIER
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
-
-operator_symbol
-  : STRING_LITERAL
-  ;
-
 
 /* LRM IEEE Std 1076-1993 2.1.1 */
 formal_parameter_list
@@ -961,7 +983,7 @@ alias_declaration
 alias_designator
   : IDENTIFIER
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
 
 
@@ -1051,7 +1073,7 @@ entity_designator
 entity_tag
   : simple_name
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   ;
 
 
@@ -1112,7 +1134,7 @@ signal_list
 /* LRM IEEE Std 1076-1993 6.1 */
 name
   : simple_name
-  | operator_symbol
+  | OPERATOR_SYMBOL
   | name (LPAREN actual_parameter_part RPAREN )?            // name or function_call (prefix)
         ( DOT suffix                                        // selected_name
         | LPAREN expression ( COMMA expression )* RPAREN    // indexed_name
@@ -1135,13 +1157,13 @@ simple_name
 /* LRM IEEE Std 1076-1993 6.3 */
 /* inlined into name */
 selected_name
-  : prefix DOT suffix
+  : simple_name (DOT suffix)*
   ;
 
 suffix
   : simple_name
   | CHARACTER_LITERAL
-  | operator_symbol
+  | OPERATOR_SYMBOL
   | ALL
   ;
 
