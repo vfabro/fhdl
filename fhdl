@@ -1,0 +1,4 @@
+#!/bin/bash
+export CLASSPATH=".:`pwd`/lib/antlr/antlr-4.0-complete.jar:`pwd`/out/:$CLASSPATH"
+
+java -cp $CLASSPATH eu.mindspark.fhdl.Fhdl $@

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="KoRu" default="usage" basedir=".">
+<project name="fhdl" default="usage" basedir=".">
 	<property file="./build.properties" />
 	
     <target name="usage">
@@ -82,7 +82,19 @@ alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && 
 		<pathelement path="${JARS}/"/> 
 	</path> 
 
-	<target name="compile" depends="grammar">
+	<target name="copy">
+		<echo message="copying other java files" />
+	 	<copy todir="${BUILDDIR}/eu/mindspark/fhdl/">
+		  <fileset dir="${SRC}/eu/mindspark/fhdl/">
+		    <include name="*.java"/>
+		  </fileset>
+		</copy>
+	</target>
+
+
+
+
+	<target name="compile" depends="grammar,copy">
 		<echo message="compile fhdl interpreter" />
 		<javac 	classpath="${ANTLR_RUNTIME}" 
 				srcdir="${BUILDDIR}"
@@ -114,6 +126,16 @@ alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && 
 			</java>
 	</target>
 
+	<target name="run" depends="compile">
+		<echo message="start fhdl main class interpreter with defalt inpt file fhdl.fhdl (this SHOULD work with eclipse built-in console)" />
+			<java classname="eu.mindspark.fhdl.Fhdl"> 
+				<classpath refid="eu.mindspark.fhdl.runPath" />
+				<arg value="--file"/>
+				<arg value="${arg0}"/>
+			</java>
+	</target>
+
+
 <!--	
 	<target name="run" depends="compile">
 		<echo message="start fhdl main class (this does not work with eclipse built-in console)" />
@@ -124,6 +146,15 @@ alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && 
 				</classpath>
 			</java>
 	</target>
+
+  <target name="run" depends="jar">
+    <java fork="true" classname="${main-class}">
+      <classpath>
+        <path refid="classpath"/>
+        <path location="${jar.dir}/${ant.project.name}.jar"/>
+      </classpath>
+    </java>
+  </target>
 	-->
 		
 	<target name="dot" depends="compile">
@@ -150,6 +181,17 @@ alias fhdlb='antlr4 -package eu.mindspark.fhdl src/eu/mindspark/fhdl/fhdl.g4 && 
 				<arg value="fhdl.fhdl"/>
 			</java>
 	</target>
+
+	<!--
+  <target name="jar" depends="compile">
+    <mkdir dir="${jar.dir}"/>
+    <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+      <manifest>
+          <attribute name="Main-Class" value="${main-class}"/>
+      </manifest>
+    </jar>
+  </target>
+	-->
 
 	<target name="rerun">
 		<echo message="start fhdl main class (this does not work with eclipse built-in console)" />
