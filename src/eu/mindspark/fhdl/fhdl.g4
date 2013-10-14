@@ -598,7 +598,9 @@ subprogram_kind
 
 /* LRM IEEE Std 1076-1993 2.3.2 */
 signature
-  : ( ( type_mark ( COMMA type_mark )* )? ( RETURN type_mark )? )?
+  : type_mark ( COMMA type_mark )*
+  | RETURN type_mark
+  | type_mark ( COMMA type_mark )* RETURN type_mark
   ;
 
 
