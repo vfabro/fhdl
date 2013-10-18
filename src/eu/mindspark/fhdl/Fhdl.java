@@ -18,6 +18,7 @@ public class Fhdl {
 			fhdlLexer lexer = new fhdlLexer(new ANTLRFileStream(arg));
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			fhdlParser p = new fhdlParser(tokens);
+			p.addParseListener(new NameCheckListener());
 			System.gc(); // Cleanup
 		}
 	}
