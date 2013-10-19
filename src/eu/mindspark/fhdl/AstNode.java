@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.mindspark.fhdl.Fhdl;
+import eu.mindspark.fhdl.fhdlParser.LabelContext;
 
 public class AstNode {
 	protected AstNodeType nodeType;
@@ -28,7 +29,9 @@ public class AstNode {
 	List<AstNode> children;
 	
 	static public enum AstNodeType {
-		AST_NULLNODE, AST_NETLIST, AST_ENTITY, AST_ARCHITECTURE
+		AST_NULLNODE, AST_NETLIST, AST_ENTITY, AST_ARCHITECTURE, AST_PROCESS,
+		AST_WAIT, AST_SIGNAL_ASSIGN, AST_VAR_ASSIGN, AST_IF, AST_CASE, AST_LOOP,
+		AST_NEXT, AST_EXIT, AST_RETURN, AST_NULL
 	};
 	
 	public AstNode (AstNodeType thisNodeType) {
@@ -40,6 +43,13 @@ public class AstNode {
 		if (name != null)
 			nodeName = name;
 	}
+
+	public AstNode (AstNodeType thisNodeType, LabelContext name) {
+		nodeType = thisNodeType;
+		if (name != null)
+			nodeName = name.getText();
+	}
+
 	
 	public void addChild (AstNode node) {
 		if (children == null) children = new ArrayList<AstNode>();
