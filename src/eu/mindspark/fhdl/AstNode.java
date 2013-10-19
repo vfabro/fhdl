@@ -28,7 +28,7 @@ public class AstNode {
 	List<AstNode> children;
 	
 	static public enum AstNodeType {
-		AST_NULL, AST_NETLIST, AST_ENTITY, AST_ARCHITECTURE
+		AST_NULLNODE, AST_NETLIST, AST_ENTITY, AST_ARCHITECTURE
 	};
 	
 	public AstNode (AstNodeType thisNodeType) {
@@ -46,7 +46,7 @@ public class AstNode {
 	}
 	
 	public boolean isNull () {
-		return nodeType == AstNodeType.AST_NULL;
+		return nodeType == AstNodeType.AST_NULLNODE;
 	}
 	
 	public String toString () {
