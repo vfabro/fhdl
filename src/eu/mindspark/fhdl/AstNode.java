@@ -89,7 +89,10 @@ public class AstNode {
 		}
 		StringBuilder buf = new StringBuilder();
 		if (! isNull()) {
-			buf.append(this.toString()+"\n");
+			String spaces = "";
+			for (int i = 0; i < level; i++)
+				spaces = spaces + "  ";
+			buf.append(spaces + this.toString()+"\n");
 		}
 		for (AstNode child : children) {
 			buf.append(child.toStringTreeOneLine(level+1));
