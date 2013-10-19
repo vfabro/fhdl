@@ -37,7 +37,8 @@ public class AstNode {
 	
 	public AstNode (AstNodeType thisNodeType, String name) {
 		nodeType = thisNodeType;
-		nodeName = name;
+		if (name != null)
+			nodeName = name;
 	}
 	
 	public void addChild (AstNode node) {
