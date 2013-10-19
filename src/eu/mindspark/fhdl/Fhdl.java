@@ -26,6 +26,6 @@ public class Fhdl {
 			astVisitor.visit(tree);
 			System.gc(); // Cleanup
 		}
-		System.out.println(astNetlist.toStringTree());
+		System.out.println(astNetlist.toStringTreeOneLine());
 	}
 }

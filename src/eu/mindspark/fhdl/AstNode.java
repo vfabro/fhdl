@@ -75,4 +75,25 @@ public class AstNode {
 		return buf.toString();
 	}
 	
+	public String toStringTreeOneLine () {
+		return this.toStringTreeOneLine(0);
+	}
+	
+	public String toStringTreeOneLine (Integer level) {
+		if (children == null || children.size() == 0) {
+			String spaces = "";
+			for (int i = 0; i < level; i++)
+				spaces = spaces + "  ";
+			return spaces + toString() + "\n";
+		}
+		StringBuilder buf = new StringBuilder();
+		if (! isNull()) {
+			buf.append(this.toString()+"\n");
+		}
+		for (AstNode child : children) {
+			buf.append(child.toStringTreeOneLine(level+1));
+		}
+		return buf.toString();
+	}	
+	
 }
